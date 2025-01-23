@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { logout } from "../stores/store";
 import axios from "axios";
 export const Logout = () => {
+  const dispatch = useDispatch(); // Use dispatch to interact with Redux
   useEffect(() => {
     (async () => {
       try {
@@ -13,11 +16,12 @@ export const Logout = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${accessToken}`,
+              Authorization: `Bearer ${accessToken}`,
             },
             withCredentials: true,
           }
         );
+        dispatch(logout());
         localStorage.clear();
         axios.defaults.headers.common["Authorization"] = null;
         window.location.href = "/login";
