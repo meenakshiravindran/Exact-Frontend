@@ -52,6 +52,7 @@ const CourseForm = () => {
       alert("Course created successfully.");
       setFormData({
         course_code: "",
+        title:"",
         dept: "",
         semester: "",
         credits: "",
@@ -86,6 +87,20 @@ const CourseForm = () => {
             onChange={handleChange}
           />
           {errors.course_code && <div className="invalid-feedback">{errors.course_code}</div>}
+        </div>
+        <div className="mb-3">
+          <label htmlFor="title" className="form-label">
+            Course Title
+          </label>
+          <input
+            type="text"
+            className={`form-control ${errors.title ? "is-invalid" : ""}`}
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+          />
+          {errors.title && <div className="invalid-feedback">{errors.title}</div>}
         </div>
         <div className="mb-3">
           <label htmlFor="dept" className="form-label">

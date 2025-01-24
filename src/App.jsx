@@ -3,11 +3,12 @@ import { Navigation } from './components/Navigation';
 import { Login } from './components/login';
 import { Home } from './components/home';
 import { Logout } from './components/logout';
-import FacultyForm from './components/addFaculty';
+import FacultyForm from './components/Faculty/addFaculty';
 import StudentForm from './components/addStudent';
 import ProgrammeForm from './components/addProgramme';
 import CourseForm from './components/addCourse';
 import BatchForm from './components/addBatch';
+import ManageFaculties from './components/Faculty/manageFaculty';
 
 function App() {
   return (
@@ -22,6 +23,8 @@ function App() {
         <Route path="/add-programme" element={<ProgrammeForm />} />
         <Route path="/add-course" element={<CourseForm />} />
         <Route path="/add-batch" element={<BatchForm />} />
+        <Route path="/manage-faculty" element={<ManageFaculties />} />
+
       </Routes>
     </BrowserRouter>);
 
