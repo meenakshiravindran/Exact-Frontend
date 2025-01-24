@@ -31,6 +31,20 @@ export const Login = () => {
       localStorage.clear();
       localStorage.setItem('access_token', data.access);
       localStorage.setItem('refresh_token', data.refresh);
+
+      // Retrieve user profile (username, role)
+      const accessToken = data.access;
+      const profileResponse = await axios.get('http://localhost:8000/user-profile/', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      // Store user details in localStorage
+      localStorage.setItem('username', profileResponse.data.username);
+      localStorage.setItem('role', profileResponse.data.role);
+
+      // Set the authorization header globally
       axios.defaults.headers.common['Authorization'] = `Bearer ${data.access}`;
 
       // Redirect after successful login
