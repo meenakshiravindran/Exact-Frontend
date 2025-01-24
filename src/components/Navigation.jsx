@@ -22,7 +22,7 @@ export function Navigation() {
             {isAuth && (
               <>
                 <Nav.Link href="/">Home</Nav.Link>
-                <Nav.Link href="/add-faculty">Add Faculty</Nav.Link>
+                <Nav.Link href="/manage-faculties">Manage Faculty</Nav.Link>
                 <Nav.Link href="/add-programme">Add Programme</Nav.Link>
                 <Nav.Link href="/add-course">Add Course</Nav.Link>
                 <Nav.Link href="/add-batch">Add Batch</Nav.Link>
