@@ -9,6 +9,7 @@ import ProgrammeForm from './components/addProgramme';
 import CourseForm from './components/addCourse';
 import BatchForm from './components/addBatch';
 import ManageFaculties from './components/Faculty/manageFaculty';
+import EditFaculty from './components/Faculty/editfaculty';
 
 function App() {
   return (
@@ -23,8 +24,8 @@ function App() {
         <Route path="/add-programme" element={<ProgrammeForm />} />
         <Route path="/add-course" element={<CourseForm />} />
         <Route path="/add-batch" element={<BatchForm />} />
-        <Route path="/manage-faculty" element={<ManageFaculties />} />
-
+        <Route path="/manage-faculties" element={<ManageFaculties />} />
+        <Route path="/edit-faculty/:facultyId" element={<EditFaculty />} />
       </Routes>
     </BrowserRouter>);
 

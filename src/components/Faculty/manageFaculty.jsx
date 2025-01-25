@@ -1,8 +1,10 @@
-// ManageFaculties.js or ManageFaculties.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Button, Table, Container, Row, Col } from 'react-bootstrap';
+import { Button, Container, Box, IconButton } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const ManageFaculties = () => {
   const [faculties, setFaculties] = useState([]);
@@ -19,7 +21,6 @@ const ManageFaculties = () => {
   }, []);
 
   const handleDelete = (facultyId) => {
-    console.log(faculties)
     // Delete a faculty
     axios.delete(`http://localhost:8000/faculties/delete/${facultyId}/`)
       .then(() => {
@@ -31,43 +32,63 @@ const ManageFaculties = () => {
       });
   };
 
-  return (
-    <Container className="mt-5">
-      <Row className="mb-3">
-        <Col>
-          <h2>Manage Faculties</h2>
-        </Col>
-        <Col className="text-end">
-          <Link to="/add-faculty">
-            <Button variant="success">Add New Faculty</Button>
-          </Link>
-        </Col>
-      </Row>
+  const rows = faculties.map((faculty) => ({
+    id: faculty.faculty_id,
+    name: faculty.name,
+  }));
 
-      <Table striped bordered hover responsive>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {faculties.map((faculty) => (
-            <tr key={faculty.faculty_id}>
-              <td>{faculty.name}</td>
-              <td>
-                <Link to={`/edit-faculty/${faculty.faculty_id}`}>
-                  <Button variant="warning" className="me-2">Edit</Button>
-                </Link>
-                <Button variant="danger" onClick={() => handleDelete(faculty.faculty_id)}>Delete</Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+  const columns = [
+    { field: 'name', headerName: 'Name', flex:0.8 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      flex:0.2,
+      headerAlign: 'center',  // Aligns header text to center
+      align: 'center',        // Aligns cell content (buttons) to center
+      sortable:false,
+      renderCell: (params) => (
+        <div style={{ display: 'flex',justifyContent:'center' }}>
+          <Link to={`/edit-faculty/${params.row.id}`}>
+            <IconButton color="primary" size="small" sx={{ marginRight: 1 }}>
+              <EditIcon />
+            </IconButton>
+          </Link>
+          <IconButton
+            color="secondary"
+            size="small"
+            onClick={() => handleDelete(params.row.id)}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <Container sx={{ marginTop: 5 }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Box>
+          <h2>Manage Faculties</h2>
+        </Box>
+        <Box>
+          <Link to="/add-faculty">
+            <Button variant="contained" color="success">
+              Add New Faculty
+            </Button>
+          </Link>
+        </Box>
+      </Box>
+
+      <div style={{ height: 400, width: '100%' }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSize={5}
+        />
+      </div>
     </Container>
   );
 };
 
 export default ManageFaculties;
-
