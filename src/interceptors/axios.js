@@ -1,16 +1,16 @@
 import axios from "axios";
-
-let refresh = false;
-
-// Axios interceptor to handle token refresh
 axios.interceptors.response.use(
   (response) => response, // Pass through successful responses
   async (error) => {
-    if (error.response && error.response.status === 401 && !refresh) {
-      refresh = true; // Set the refresh flag to avoid multiple refresh calls
+    const originalRequest = error.config; // Save the original request
+
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true; // Avoid infinite retries
 
       try {
-        // Refresh the token
+        console.log("Refreshing token...");
+
+        // Refresh the access token
         const response = await axios.post(
           "http://localhost:8000/token/refresh/",
           {
@@ -19,14 +19,14 @@ axios.interceptors.response.use(
           {
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${accessToken}`,
             },
-            withCredentials: true,
           }
         );
 
         if (response.status === 200) {
-          // Update the tokens in localStorage and Axios headers
+          console.log("Token refresh successful");
+
+          // Update the access token in localStorage and Axios headers
           const newAccessToken = response.data.access;
           const newRefreshToken = response.data.refresh;
 
@@ -36,20 +36,19 @@ axios.interceptors.response.use(
           localStorage.setItem("access_token", newAccessToken);
           localStorage.setItem("refresh_token", newRefreshToken);
 
+
           // Retry the original request with the new token
-          return axios(error.config);
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          return axios(originalRequest);
         }
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
         // Handle token refresh failure (e.g., log out the user)
         localStorage.clear();
         window.location.href = "/login";
-      } finally {
-        refresh = false; // Reset the refresh flag
       }
     }
 
-    refresh = false; // Reset the refresh flag if the error isn't handled
-    return Promise.reject(error); // Reject the error to handle it elsewhere
+    return Promise.reject(error);
   }
 );
