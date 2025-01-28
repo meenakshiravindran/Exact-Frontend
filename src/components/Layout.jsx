@@ -90,16 +90,16 @@ const ExactLayout = () => {
               <Link to="/manage-faculties">Faculties</Link>
             </Menu.Item>
             <Menu.Item key="3" icon={<GroupWork style={{ fontSize: "20px" }} />}>
-              <Link to="/add-batch">Batch</Link>
+              <Link to="/manage-batches">Batch</Link>
             </Menu.Item>
             <Menu.Item key="4" icon={<MenuBook style={{ fontSize: "20px" }} />}>
-              <Link to="/add-course">Courses</Link>
+              <Link to="/manage-courses">Courses</Link>
             </Menu.Item>
             <Menu.Item key="5" icon={<School style={{ fontSize: "20px" }} />}>
-              <Link to="/add-programme">Programmes</Link>
+              <Link to="/manage-programmes">Programmes</Link>
             </Menu.Item>
             <Menu.Item key="6" icon={<People style={{ fontSize: "20px" }} />}>
-              <Link to="/add-student">Students</Link>
+              <Link to="/manage-students">Students</Link>
             </Menu.Item>
           </Menu.SubMenu>
         </Menu>
