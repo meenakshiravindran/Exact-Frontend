@@ -18,6 +18,7 @@ import ManageBatches from './components/Batch/manageBatch';
 import EditProgramme from './components/Programme/editProgramme';
 import ManageProgrammes from './components/Programme/manageProgramme';
 import { Login } from "./components/Auth/login";
+import LoginPage from "./components/Auth/loginPage";
 
 
 function App() {
@@ -25,7 +26,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Routes that don't require ExactLayout */}
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/logout" element={<Logout />} />
 

@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Box, Button, TextField, Typography, Card, CardContent } from '@mui/material';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Card,
+  CardContent,
+  CardHeader,
+  Alert,
+} from "@mui/material";
 
 export const Login = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
   const handleLogin = async (e) => {
@@ -16,91 +25,125 @@ export const Login = () => {
     const user = { username, password };
 
     try {
-      const { data } = await axios.post('http://localhost:8000/token/', user, {
+      const { data } = await axios.post("http://localhost:8000/token/", user, {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         withCredentials: true,
       });
 
       localStorage.clear();
-      localStorage.setItem('access_token', data.access);
-      localStorage.setItem('refresh_token', data.refresh);
+      localStorage.setItem("access_token", data.access);
+      localStorage.setItem("refresh_token", data.refresh);
 
       const accessToken = data.access;
-      const profileResponse = await axios.get('http://localhost:8000/user-profile/', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const profileResponse = await axios.get(
+        "http://localhost:8000/user-profile/",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
-      localStorage.setItem('username', profileResponse.data.username);
-      localStorage.setItem('role', profileResponse.data.role);
-      localStorage.setItem('full_name', profileResponse.data.full_name);
+      localStorage.setItem("username", profileResponse.data.username);
+      localStorage.setItem("role", profileResponse.data.role);
+      localStorage.setItem("full_name", profileResponse.data.full_name);
 
-      axios.defaults.headers.common['Authorization'] = `Bearer ${data.access}`;
+      axios.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
 
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Error during login:', error);
-      setError('Invalid username or password. Please try again.');
+      console.error("Error during login:", error);
+      setError("Invalid username or password. Please try again.");
     }
   };
 
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-      <Card sx={{ maxWidth: 400, width: '100%', padding: 4 }}>
-        <CardContent>
-          <Typography variant="h5" component="div" align="center" gutterBottom>
-            Sign In
-          </Typography>
-          {error && (
-            <Box mb={2}>
-              <Typography variant="body1" color="error" align="center">
-                {error}
-              </Typography>
-            </Box>
-          )}
-          <form onSubmit={handleLogin}>
-            <Box mb={2}>
-              <TextField
-                id="username"
-                label="Username"
-                variant="outlined"
-                placeholder="Enter your username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                fullWidth
-              />
-            </Box>
-            <Box mb={2}>
-              <TextField
-                id="password"
-                label="Password"
-                type="password"
-                variant="outlined"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                fullWidth
-              />
-            </Box>
-            <Box mb={2}>
-              <Button type="submit" variant="contained" color="primary" fullWidth>
-                Sign In
-              </Button>
-            </Box>
-          </form>
-          <Box textAlign="center">
-            <Typography variant="body1">
-              Don't have an account?{' '}
-              <Link to="/register" style={{ color: '#1976d2' }}>
-                Register here
-              </Link>
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="100vh"
+    >
+      <Card
+        sx={{
+          minWidth: {md:"600px",sm:"400px"},
+          width:"100%",
+          padding: "1.5rem",
+          margin: "2rem auto",
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          borderRadius: "8px",
+        }}
+      >
+        <CardHeader
+          title={
+            <Typography variant="h5" fontWeight="bold" sx={{marginBottom:1}}>
+              Sign In
             </Typography>
-          </Box>
+          }
+          subheader={
+            <Typography variant="body2" color="text.secondary">
+              Enter your credentials to access your account
+            </Typography>
+          }
+        />
+        <CardContent sx={{ paddingTop: 0 }}>
+          <form onSubmit={handleLogin}>
+            {error && (
+              <Alert severity="error" sx={{ marginBottom: 2 }}>
+                {error}
+              </Alert>
+            )}
+            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+              Username
+            </Typography>
+            <TextField
+              fullWidth
+              variant="outlined"
+              // label="Username"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              sx={{ marginBottom: 2 }}
+            />
+            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+              Password
+            </Typography>
+            <TextField
+              fullWidth
+              variant="outlined"
+              // label="Password"
+              placeholder="Enter your password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{
+                marginTop: 3,
+                padding: "10px 0",
+              }}
+            >
+              Sign In
+            </Button>
+          </form>
+          {/* <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ textAlign: "left", marginTop: 2 }}
+          >
+            Don't have an account?{" "}
+            <Typography onClick={setIsRegister(true)}
+            >
+              Register here
+            </Typography>
+          </Typography> */}
         </CardContent>
       </Card>
     </Box>
