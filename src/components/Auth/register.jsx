@@ -15,9 +15,12 @@ import { useNavigate } from "react-router-dom";
 const RegisterForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
     username: "",
     password: "",
-    role: "teacher", // default role
+    role: "teacher", // Default role
   });
 
   const [message, setMessage] = useState("");
@@ -39,10 +42,10 @@ const RegisterForm = () => {
         formData
       );
       setMessage(response.data.message); // Set success message
-      navigate('/login')
+      navigate("/login");
     } catch (error) {
       setMessage(
-        "Error: " + error.response?.data?.detail || "Registration failed"
+        "Error: " + error.response?.data?.error || "Registration failed"
       );
     }
   };
@@ -53,6 +56,40 @@ const RegisterForm = () => {
         Register
       </Typography>
       <form onSubmit={handleSubmit}>
+        {/* Full Name Field */}
+        <TextField
+          label="First Name"
+          name="first_name"
+          value={formData.first_name}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          variant="outlined"
+          required
+        />
+        <TextField
+          label="Last Name"
+          name="last_name"
+          value={formData.last_name}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          variant="outlined"
+          required
+        />
+
+        {/* Email Field */}
+        <TextField
+          label="Email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+          variant="outlined"
+          required
+        />
+
         {/* Username Field */}
         <TextField
           label="Username"
@@ -62,6 +99,7 @@ const RegisterForm = () => {
           fullWidth
           margin="normal"
           variant="outlined"
+          required
         />
 
         {/* Password Field */}
@@ -74,6 +112,7 @@ const RegisterForm = () => {
           fullWidth
           margin="normal"
           variant="outlined"
+          required
         />
 
         {/* Role Selection */}
@@ -90,17 +129,23 @@ const RegisterForm = () => {
             <MenuItem value="admin">Admin</MenuItem>
           </Select>
         </FormControl>
-
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          sx={{ marginTop: 2 }}
-        >
-          Register
-        </Button>
+        <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => navigate("/login")}
+          >
+            Back
+          </Button>
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+          >
+            Register
+          </Button>
+        </Box>
       </form>
 
       {message && (
