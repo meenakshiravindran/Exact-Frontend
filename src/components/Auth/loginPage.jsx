@@ -23,7 +23,7 @@ export default function LoginPage() {
             color: "#333",
           }}
         >
-          Exact
+          EXACT
         </Typography>
       </Box>
 
