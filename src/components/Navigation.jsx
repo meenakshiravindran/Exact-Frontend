@@ -42,9 +42,9 @@ export function Navigation() {
                 {role === 'admin' && (  // Render admin specific links
                   <>
                     <Nav.Link href="/manage-faculties">Manage Faculty</Nav.Link>
-                    <Nav.Link href="/add-programme">Add Programme</Nav.Link>
-                    <Nav.Link href="/add-course">Add Course</Nav.Link>
-                    <Nav.Link href="/add-batch">Add Batch</Nav.Link>
+                    <Nav.Link href="/manage-programmes">Manage Programme</Nav.Link>
+                    <Nav.Link href="/manage-courses">Manage Course</Nav.Link>
+                    <Nav.Link href="/manage-batches">Manage Batch</Nav.Link>
                   </>
                 )}
                 {role === 'teacher' && (  // Render teacher specific links
