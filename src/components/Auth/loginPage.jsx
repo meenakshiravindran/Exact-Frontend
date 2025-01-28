@@ -53,7 +53,7 @@ export default function LoginPage() {
               justifyContent: "center",
               alignItems: "center",
               textAlign: "center",
-              display:{sm:"none",md:"block"},
+              display:{sm:"none",md:"block"},//Dont displa tehis text on mobile screen
               mb: { xs: 4, md: 0 }, // Add margin for smaller screens
             }}
           >
