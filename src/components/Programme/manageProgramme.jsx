@@ -71,7 +71,7 @@ const ManageProgrammes = () => {
             </IconButton>
           </Link>
           <IconButton
-            color="secondary"
+            color="	#d83131"
             size="small"
             onClick={() => handleOpenDialog(params.row.id)}
           >
