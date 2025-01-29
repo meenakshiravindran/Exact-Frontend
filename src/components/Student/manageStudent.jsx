@@ -10,6 +10,11 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
@@ -19,9 +24,10 @@ const ManageStudents = () => {
   const [students, setStudents] = useState([]);
   const [programmes, setProgrammes] = useState([]);
   const [selectedProgramme, setSelectedProgramme] = useState("");
+  const [open, setOpen] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
 
   useEffect(() => {
-    // Fetch all programmes
     axios
       .get("http://localhost:8000/get-programme/")
       .then((response) => {
@@ -34,11 +40,8 @@ const ManageStudents = () => {
 
   useEffect(() => {
     if (selectedProgramme) {
-      // Fetch students based on selected programme
       axios
-        .get(
-          `http://localhost:8000/students/by-programme/${selectedProgramme}/`
-        )
+        .get(`http://localhost:8000/students/by-programme/${selectedProgramme}/`)
         .then((response) => {
           setStudents(response.data);
         })
@@ -48,19 +51,28 @@ const ManageStudents = () => {
     }
   }, [selectedProgramme]);
 
-  const handleDelete = (studentId) => {
-    // Delete a student
+  const handleDelete = () => {
     axios
-      .delete(`http://localhost:8000/students/delete/${studentId}/`)
+      .delete(`http://localhost:8000/students/delete/${selectedStudentId}/`)
       .then(() => {
-        // After deletion, fetch updated student list
         setStudents(
-          students.filter((student) => student.student_id !== studentId)
+          students.filter((student) => student.student_id !== selectedStudentId)
         );
+        setOpen(false);
       })
       .catch((error) => {
         console.error("Error deleting student:", error);
       });
+  };
+
+  const handleDialogOpen = (studentId) => {
+    setSelectedStudentId(studentId);
+    setOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setOpen(false);
+    setSelectedStudentId(null);
   };
 
   const rows = students.map((student) => ({
@@ -91,7 +103,7 @@ const ManageStudents = () => {
           <IconButton
             color="secondary"
             size="small"
-            onClick={() => handleDelete(params.row.id)}
+            onClick={() => handleDialogOpen(params.row.id)}
           >
             <DeleteIcon />
           </IconButton>
@@ -102,12 +114,7 @@ const ManageStudents = () => {
 
   return (
     <Container sx={{ marginTop: 5 }}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <h2>Manage Students</h2>
         <Box>
           <Link to="/add-student">
@@ -118,7 +125,6 @@ const ManageStudents = () => {
         </Box>
       </Box>
 
-      {/* Programme Dropdown */}
       <FormControl fullWidth margin="normal">
         <InputLabel id="programme-label">Select Programme</InputLabel>
         <Select
@@ -141,6 +147,23 @@ const ManageStudents = () => {
       <div style={{ height: 400, width: "100%" }}>
         <DataGrid rows={rows} columns={columns} pageSize={5} />
       </div>
+
+      <Dialog open={open} onClose={handleDialogClose}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this student? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="secondary" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

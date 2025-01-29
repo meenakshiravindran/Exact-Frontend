@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Button, Container, Box, IconButton } from '@mui/material';
+import { Button, Container, Box, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const ManageProgrammes = () => {
   const [programmes, setProgrammes] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedProgramme, setSelectedProgramme] = useState(null);
 
   useEffect(() => {
     // Fetch all programmes
@@ -20,23 +22,34 @@ const ManageProgrammes = () => {
       });
   }, []);
 
-  const handleDelete = (programmeId) => {
-    // Delete a programme
-    axios.delete(`http://localhost:8000/programmes/delete/${programmeId}/`)
-      .then(() => {
-        // After deletion, fetch updated programme list
-        setProgrammes(programmes.filter(programme => programme.programme_id !== programmeId));
-      })
-      .catch(error => {
-        console.error('Error deleting programme:', error);
-      });
+  const handleOpenDialog = (programmeId) => {
+    setSelectedProgramme(programmeId);
+    setOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+    setSelectedProgramme(null);
+  };
+
+  const handleDelete = () => {
+    if (selectedProgramme) {
+      axios.delete(`http://localhost:8000/programmes/delete/${selectedProgramme}/`)
+        .then(() => {
+          setProgrammes(programmes.filter(programme => programme.programme_id !== selectedProgramme));
+          handleCloseDialog();
+        })
+        .catch(error => {
+          console.error('Error deleting programme:', error);
+        });
+    }
   };
 
   const rows = programmes.map((programme) => ({
     id: programme.programme_id,
     programme_name: programme.programme_name,
-    department: programme.department, // Assuming the department is just the name, adjust if needed
-    level: programme.level, // Assuming level is just the name, adjust if needed
+    department: programme.department,
+    level: programme.level,
   }));
 
   const columns = [
@@ -47,8 +60,8 @@ const ManageProgrammes = () => {
       field: 'actions',
       headerName: 'Actions',
       flex: 0.2,
-      headerAlign: 'center',  // Aligns header text to center
-      align: 'center',        // Aligns cell content (buttons) to center
+      headerAlign: 'center',
+      align: 'center',
       sortable: false,
       renderCell: (params) => (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -60,7 +73,7 @@ const ManageProgrammes = () => {
           <IconButton
             color="secondary"
             size="small"
-            onClick={() => handleDelete(params.row.id)}
+            onClick={() => handleOpenDialog(params.row.id)}
           >
             <DeleteIcon />
           </IconButton>
@@ -91,6 +104,24 @@ const ManageProgrammes = () => {
           pageSize={5}
         />
       </div>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={open} onClose={handleCloseDialog}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this programme? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="secondary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
