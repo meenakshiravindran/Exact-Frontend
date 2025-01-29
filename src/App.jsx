@@ -16,7 +16,6 @@ import EditBatch from './components/Batch/editBatch';
 import ManageBatches from './components/Batch/manageBatch';
 import EditProgramme from './components/Programme/editProgramme';
 import ManageProgrammes from './components/Programme/manageProgramme';
-import { Login } from "./components/Auth/login";
 import LoginPage from "./components/Auth/loginPage";
 import EditFaculty from "./components/Faculty/editFaculty";
 import EditStudent from "./components/Student/editStudent";
@@ -25,6 +24,8 @@ import AddProgrammeOutcome from "./components/PO/addPO";
 import AddCO from "./components/CourseOutcome/addCOs";
 import ManageCO from "./components/CourseOutcome/manageCOs";
 import EditCO from "./components/CourseOutcome/editCOs";
+import ManageProgrammeOutcomes from "./components/PO/managePO";
+import EditPO from "./components/PO/editPO";
 
 
 function App() {
@@ -49,11 +50,15 @@ function App() {
           <Route path="/add-faculty" element={ <ProtectedRoute element={<FacultyForm />} allowedRoles={["admin"]}/>}/>
           <Route path="/edit-course/:courseId" element={<ProtectedRoute element={<EditCourse />} allowedRoles={['admin','teacher']} />} />
           <Route path="/manage-courses" element={<ProtectedRoute element={<ManageCourses />} allowedRoles={['admin','teacher']} />} />
-          <Route path="/edit-batch/:batchId" element={<ProtectedRoute element={<EditBatch />} allowedRoles={['admin']} />} />
-          <Route path="/manage-batches" element={<ProtectedRoute element={<ManageBatches />} allowedRoles={['admin']} />} />
+          <Route path="/edit-batch/:batchId" element={<ProtectedRoute element={<EditBatch />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/manage-batches" element={<ProtectedRoute element={<ManageBatches />} allowedRoles={['admin','teacher']} />} />
           <Route path="/edit-programme/:programmeId" element={<ProtectedRoute element={<EditProgramme />} allowedRoles={['admin']} />} />
           <Route path="/manage-programmes" element={<ProtectedRoute element={<ManageProgrammes />} allowedRoles={['admin','teacher']} />} />
           <Route path="/add-pos" element={<ProtectedRoute element={<AddProgrammeOutcome />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/manage-pos" element={<ProtectedRoute element={<ManageProgrammeOutcomes />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/edit-pos/:poId" element={<ProtectedRoute element={<EditPO />} allowedRoles={['admin','teacher']} />} />
+
+
 
           <Route path="/add-cos" element={<ProtectedRoute element={<AddCO />} allowedRoles={['admin','teacher']} />} />
           <Route path="/edit-cos" element={<ProtectedRoute element={<EditCO />} allowedRoles={['admin','teacher']} />} />
