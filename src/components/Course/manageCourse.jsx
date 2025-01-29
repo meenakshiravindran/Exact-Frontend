@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Button, Container, Box, IconButton } from '@mui/material';
+import {
+  Button,
+  Container,
+  Box,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const ManageCourses = () => {
   const [courses, setCourses] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
 
   useEffect(() => {
     // Fetch all courses
@@ -20,16 +32,26 @@ const ManageCourses = () => {
       });
   }, []);
 
-  const handleDelete = (courseId) => {
-    // Delete a course
-    axios.delete(`http://localhost:8000/courses/delete/${courseId}/`)
+  const handleDelete = () => {
+    // Delete the selected course
+    axios.delete(`http://localhost:8000/courses/delete/${selectedCourseId}/`)
       .then(() => {
-        // After deletion, fetch updated course list
-        setCourses(courses.filter(course => course.course_id !== courseId));
+        setCourses(courses.filter(course => course.course_id !== selectedCourseId));
+        setOpen(false);
       })
       .catch(error => {
         console.error('Error deleting course:', error);
       });
+  };
+
+  const handleDialogOpen = (courseId) => {
+    setSelectedCourseId(courseId);
+    setOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setOpen(false);
+    setSelectedCourseId(null);
   };
 
   const rows = courses.map((course) => ({
@@ -58,7 +80,7 @@ const ManageCourses = () => {
           <IconButton
             color="secondary"
             size="small"
-            onClick={() => handleDelete(params.row.id)}
+            onClick={() => handleDialogOpen(params.row.id)}
           >
             <DeleteIcon />
           </IconButton>
@@ -89,6 +111,24 @@ const ManageCourses = () => {
           pageSize={5}
         />
       </div>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={open} onClose={handleDialogClose}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this course? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="secondary" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
