@@ -67,7 +67,7 @@ export default function LoginPage() {
               Bridging curriculum
               <br />
               <span style={{ color: "purple" }}>
-                goals with measurable outcomes.
+                goals with measurable ounonetcomes.
               </span>
             </Typography>
           </Box>

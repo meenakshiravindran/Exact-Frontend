@@ -7,7 +7,6 @@ import ProgrammeForm from "./components/Programme/addProgramme";
 import CourseForm from "./components/Course/addCourse";
 import BatchForm from "./components//Batch/addBatch";
 import ManageFaculties from "./components/Faculty/manageFaculty";
-import EditFaculty from "./components/Faculty/editFaculty";
 import RegisterForm from "./components/Auth/register";
 import ProtectedRoute from "./ProtectedRoutes";
 import ExactLayout from "./components/Layout";
@@ -19,21 +18,25 @@ import EditProgramme from './components/Programme/editProgramme';
 import ManageProgrammes from './components/Programme/manageProgramme';
 import { Login } from "./components/Auth/login";
 import LoginPage from "./components/Auth/loginPage";
+import EditFaculty from "./components/Faculty/editFaculty";
+import EditStudent from "./components/Student/editStudent";
+import ManageStudents from "./components/Student/manageStudent";
 
 
 function App() {
   return (
     <BrowserRouter>
+
       <Routes>
         {/* Routes that don't require ExactLayout */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/logout" element={<Logout />} />
-
-        {/* Routes that require ExactLayout */}
-        <Route element={<ExactLayout />}>
+        <Route  element={<ExactLayout />} >
           <Route path="/" element={<Home />} />
           <Route path="/add-student" element={ <ProtectedRoute element={<StudentForm />} allowedRoles={["admin", "teacher"]}/>}/>
+          <Route path="/edit-student/:studentId" element={ <ProtectedRoute element={<EditStudent />} allowedRoles={["admin", "teacher"]}/>}/>
+          <Route path="/manage-students/" element={ <ProtectedRoute element={<ManageStudents />} allowedRoles={["admin", "teacher"]}/>}/>
           <Route path="/add-programme" element={<ProtectedRoute element={<ProgrammeForm />} allowedRoles={["admin", "teacher"]}/>} />
           <Route path="/add-course" element={ <ProtectedRoute element={<CourseForm />} allowedRoles={["admin", "teacher"]} />}/>
           <Route path="/add-batch"  element={<ProtectedRoute element={<BatchForm />} allowedRoles={["admin", "teacher"]}/>}/>
@@ -45,7 +48,7 @@ function App() {
           <Route path="/edit-batch/:batchId" element={<ProtectedRoute element={<EditBatch />} allowedRoles={['admin']} />} />
           <Route path="/manage-batches" element={<ProtectedRoute element={<ManageBatches />} allowedRoles={['admin']} />} />
           <Route path="/edit-programme/:programmeId" element={<ProtectedRoute element={<EditProgramme />} allowedRoles={['admin']} />} />
-          <Route path="/manage-programmes" element={<ProtectedRoute element={<ManageProgrammes />} allowedRoles={['admin']} />} />
+          <Route path="/manage-programmes" element={<ProtectedRoute element={<ManageProgrammes />} allowedRoles={['admin','teacher']} />} />
         </Route>
       </Routes>
     </BrowserRouter>

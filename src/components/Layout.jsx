@@ -70,8 +70,11 @@ const ExactLayout = () => {
             backgroundColor: "rgba(255, 255, 255, 0.2)", // Subtle background color
             borderRadius: borderRadiusLG,
             margin: "10px",
+            display:"flex",justifyContent:"center",alignItems:"center",
           }}
-        />
+        >
+          <img src="./nascshort.png" style={{height:"30px"}}/>
+        </div>
         <Menu
           theme="dark"
           mode="inline"
