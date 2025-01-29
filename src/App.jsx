@@ -21,6 +21,7 @@ import LoginPage from "./components/Auth/loginPage";
 import EditFaculty from "./components/Faculty/editFaculty";
 import EditStudent from "./components/Student/editStudent";
 import ManageStudents from "./components/Student/manageStudent";
+import AddProgrammeOutcome from "./components/PO/addPO";
 
 
 function App() {
@@ -49,6 +50,8 @@ function App() {
           <Route path="/manage-batches" element={<ProtectedRoute element={<ManageBatches />} allowedRoles={['admin']} />} />
           <Route path="/edit-programme/:programmeId" element={<ProtectedRoute element={<EditProgramme />} allowedRoles={['admin']} />} />
           <Route path="/manage-programmes" element={<ProtectedRoute element={<ManageProgrammes />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/add-pos" element={<ProtectedRoute element={<AddProgrammeOutcome />} allowedRoles={['admin','teacher']} />} />
+
         </Route>
       </Routes>
     </BrowserRouter>
