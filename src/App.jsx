@@ -21,6 +21,9 @@ import LoginPage from "./components/Auth/loginPage";
 import EditFaculty from "./components/Faculty/editFaculty";
 import EditStudent from "./components/Student/editStudent";
 import ManageStudents from "./components/Student/manageStudent";
+import AddCO from "./components/CourseOutcome/addCOs";
+import ManageCO from "./components/CourseOutcome/manageCOs";
+import EditCO from "./components/CourseOutcome/editCOs";
 
 
 function App() {
@@ -49,6 +52,12 @@ function App() {
           <Route path="/manage-batches" element={<ProtectedRoute element={<ManageBatches />} allowedRoles={['admin']} />} />
           <Route path="/edit-programme/:programmeId" element={<ProtectedRoute element={<EditProgramme />} allowedRoles={['admin']} />} />
           <Route path="/manage-programmes" element={<ProtectedRoute element={<ManageProgrammes />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/add-cos" element={<ProtectedRoute element={<AddCO />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/edit-cos" element={<ProtectedRoute element={<EditCO />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/manage-cos" element={<ProtectedRoute element={<ManageCO />} allowedRoles={['admin','teacher']} />} />
+
+ 
+ 
         </Route>
       </Routes>
     </BrowserRouter>
