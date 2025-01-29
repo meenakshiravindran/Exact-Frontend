@@ -26,6 +26,7 @@ import ManageCO from "./components/CourseOutcome/manageCOs";
 import EditCO from "./components/CourseOutcome/editCOs";
 import ManageProgrammeOutcomes from "./components/PO/managePO";
 import EditPO from "./components/PO/editPO";
+import QuestionForm from "./components/Questions/addQuestion";
 
 
 function App() {
@@ -64,6 +65,9 @@ function App() {
           <Route path="/edit-cos" element={<ProtectedRoute element={<EditCO />} allowedRoles={['admin','teacher']} />} />
           <Route path="/manage-cos" element={<ProtectedRoute element={<ManageCO />} allowedRoles={['admin','teacher']} />} />
 
+
+          <Route path="/add-question" element={<ProtectedRoute element={<QuestionForm />} allowedRoles={['admin','teacher']} />} />
+          
  
  
         </Route>
