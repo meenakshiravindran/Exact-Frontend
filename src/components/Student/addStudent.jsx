@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
+import {
+  Container,
+  TextField,
+  Button,
+  Box,
+  MenuItem,
+  Typography,
+  Select,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const StudentForm = () => {
   const [formData, setFormData] = useState({
@@ -14,8 +25,8 @@ const StudentForm = () => {
 
   const [errors, setErrors] = useState({});
   const [programmes, setProgrammes] = useState([]);
+  const navigate = useNavigate();
 
-  // Fetch programmes on component mount
   useEffect(() => {
     const fetchProgrammes = async () => {
       try {
@@ -25,7 +36,6 @@ const StudentForm = () => {
         console.error("Error fetching programmes:", error);
       }
     };
-
     fetchProgrammes();
   }, []);
 
@@ -36,8 +46,8 @@ const StudentForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8000/add-student/", formData);
-      alert("Student created successfully.");
+      await axios.post("http://localhost:8000/add-student/", formData);
+      alert("Student added successfully.");
       setFormData({
         register_no: "",
         name: "",
@@ -46,6 +56,7 @@ const StudentForm = () => {
         phone_number: "",
         email: "",
       });
+      navigate("/manage-students");
       setErrors({});
     } catch (error) {
       if (error.response && error.response.data) {
@@ -57,106 +68,43 @@ const StudentForm = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="text-center mb-4">Add Student</h2>
-      <form onSubmit={handleSubmit} className="shadow p-4 rounded bg-light">
-        <div className="mb-3">
-          <label htmlFor="register_no" className="form-label">
-            Register Number
-          </label>
-          <input
-            type="text"
-            className={`form-control ${errors.register_no ? "is-invalid" : ""}`}
-            id="register_no"
-            name="register_no"
-            value={formData.register_no}
-            onChange={handleChange}
-          />
-          {errors.register_no && <div className="invalid-feedback">{errors.register_no}</div>}
-        </div>
-        <div className="mb-3">
-          <label htmlFor="name" className="form-label">
-            Name
-          </label>
-          <input
-            type="text"
-            className={`form-control ${errors.name ? "is-invalid" : ""}`}
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-          {errors.name && <div className="invalid-feedback">{errors.name}</div>}
-        </div>
-        <div className="mb-3">
-          <label htmlFor="programme" className="form-label">
-            Programme
-          </label>
-          <select
-            className={`form-select ${errors.programme ? "is-invalid" : ""}`}
-            id="programme"
-            name="programme"
-            value={formData.programme}
-            onChange={handleChange}
-          >
-            <option value="">Select Programme</option>
+    <Container maxWidth="sm" sx={{ mt: 5 }}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ p: 3, border: "1px solid #ccc", borderRadius: "8px" }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          Add Student
+        </Typography>
+        
+        <TextField fullWidth label="Register Number" name="register_no" value={formData.register_no} onChange={handleChange} error={!!errors.register_no} helperText={errors.register_no} margin="normal" />
+        
+        <TextField fullWidth label="Name" name="name" value={formData.name} onChange={handleChange} error={!!errors.name} helperText={errors.name} margin="normal" />
+        
+        <FormControl fullWidth margin="normal" error={!!errors.programme}>
+          <InputLabel id="programme-label">Programme</InputLabel>
+          <Select labelId="programme-label" label="Programme" name="programme" value={formData.programme} onChange={handleChange}>
+            <MenuItem value="">
+              <em>Select Programme</em>
+            </MenuItem>
             {programmes.map((prog) => (
-              <option key={prog.programme_id} value={prog.programme_name}>
+              <MenuItem key={prog.programme_id} value={prog.programme_name}>
                 {prog.programme_name}
-              </option>
+              </MenuItem>
             ))}
-          </select>
-          {errors.programme && <div className="invalid-feedback">{errors.programme}</div>}
-        </div>
-        <div className="mb-3">
-          <label htmlFor="year_of_admission" className="form-label">
-            Year of Admission
-          </label>
-          <input
-            type="number"
-            className={`form-control ${errors.year_of_admission ? "is-invalid" : ""}`}
-            id="year_of_admission"
-            name="year_of_admission"
-            value={formData.year_of_admission}
-            onChange={handleChange}
-          />
-          {errors.year_of_admission && <div className="invalid-feedback">{errors.year_of_admission}</div>}
-        </div>
-        <div className="mb-3">
-          <label htmlFor="phone_number" className="form-label">
-            Phone Number
-          </label>
-          <input
-            type="text"
-            className={`form-control ${errors.phone_number ? "is-invalid" : ""}`}
-            id="phone_number"
-            name="phone_number"
-            value={formData.phone_number}
-            onChange={handleChange}
-          />
-          {errors.phone_number && <div className="invalid-feedback">{errors.phone_number}</div>}
-        </div>
-        <div className="mb-3">
-          <label htmlFor="email" className="form-label">
-            Email
-          </label>
-          <input
-            type="email"
-            className={`form-control ${errors.email ? "is-invalid" : ""}`}
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          {errors.email && <div className="invalid-feedback">{errors.email}</div>}
-        </div>
-        <div className="text-center">
-          <button type="submit" className="btn btn-primary">
-            Submit
-          </button>
-        </div>
-      </form>
-    </div>
+          </Select>
+          {errors.programme && <Typography variant="caption" color="error">{errors.programme}</Typography>}
+        </FormControl>
+        
+        <TextField fullWidth label="Year of Admission" name="year_of_admission" type="number" value={formData.year_of_admission} onChange={handleChange} error={!!errors.year_of_admission} helperText={errors.year_of_admission} margin="normal" />
+        
+        <TextField fullWidth label="Phone Number" name="phone_number" value={formData.phone_number} onChange={handleChange} error={!!errors.phone_number} helperText={errors.phone_number} margin="normal" />
+        
+        <TextField fullWidth label="Email" name="email" type="email" value={formData.email} onChange={handleChange} error={!!errors.email} helperText={errors.email} margin="normal" />
+        
+        <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
+          <Button variant="outlined" color="secondary" onClick={() => navigate("/manage-students")}>Back</Button>
+          <Button variant="contained" type="submit">Submit</Button>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 
