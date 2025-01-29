@@ -5,34 +5,32 @@ import {
   DownOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
-import { Link, Outlet, useNavigate } from "react-router-dom"; // Use Outlet to render nested routes
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import {
-  Menu as MuiMenu, //Matte sidebar import aakyel Menu parnjittoru sanundayni appo mui menu import akan aavnindayta athond import menu as muiMenu aaki
+  Menu as MuiMenu,
   MenuItem,
   ListItemIcon,
-} from "@mui/material"; // MUI Menu and MenuItem
+} from "@mui/material";
 import { Space } from "antd/es";
 import {
   Home,
   People,
-  Group,
+  GroupWork,
   MenuBook,
   School,
-  PersonAdd,
   Person,
   AccountCircle,
   ExitToApp,
   ManageAccounts,
-  GroupWork,
-} from "@mui/icons-material"; // Import MUI icons
-import '../index.css'
+} from "@mui/icons-material";
+import "../index.css";
 
-const { Header, Sider, Content } = Layout;
+const { Header, Sider, Content,Footer } = Layout;
 
 const ExactLayout = () => {
   const [userName, setUserName] = useState("");
   const [collapsed, setCollapsed] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null); // For MUI menu
+  const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -45,18 +43,15 @@ const ExactLayout = () => {
     }
   }, []);
 
-  // Handle logout logic
   const handleLogout = () => {
-    navigate("/logout"); // Redirect to login page
-    setAnchorEl(null); // Close the menu after logout
+    navigate("/logout");
+    setAnchorEl(null);
   };
 
-  // Open the MUI menu on click
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  // Close the MUI menu
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
@@ -64,23 +59,36 @@ const ExactLayout = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
+        {/* Logo Section */}
         <div
           style={{
-            height: "45px", // Matches the height of the header
-            backgroundColor: "rgba(255, 255, 255, 0.2)", // Subtle background color
+            height: "45px",
+            backgroundColor: "rgba(255, 255, 255, 0.2)",
             borderRadius: borderRadiusLG,
             margin: "10px",
-            display:"flex",justifyContent:"center",alignItems:"center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: collapsed ? "center" : "flex-start",
+            paddingLeft: collapsed ? "0px" : "10px",
           }}
         >
-          <img src="./nascshort.png" style={{height:"30px"}}/>
+          <img src="./nascshort.png" style={{ height: "30px",marginLeft:"5%" }} alt="Logo" />
+          {!collapsed && (
+            <span
+              style={{
+                marginLeft: "10px",
+                fontSize: "18px",
+                fontWeight: "bold",
+                color: "white",
+              }}
+            >
+              NASC
+            </span>
+          )}
         </div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["1"]}
-          defaultOpenKeys={["sub1"]}
-        >
+
+        {/* Sidebar Menu */}
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
           <Menu.Item key="1" icon={<Home style={{ fontSize: "20px" }} />}>
             <Link to="/">Home</Link>
           </Menu.Item>
@@ -107,7 +115,9 @@ const ExactLayout = () => {
           </Menu.SubMenu>
         </Menu>
       </Sider>
+
       <Layout>
+        {/* Header Section */}
         <Header
           style={{
             padding: 0,
@@ -117,7 +127,6 @@ const ExactLayout = () => {
             alignItems: "center",
           }}
         >
-          {/* App Name on the left */}
           <div style={{ display: "flex", height: "100%" }}>
             <Button
               type="text"
@@ -129,10 +138,12 @@ const ExactLayout = () => {
                 height: 64,
               }}
             />
-            <p style={{ fontSize: "24px", fontWeight: "bold" }}>EXACT</p>
+            <p style={{ fontSize: "24px", fontWeight: "bold", marginLeft: "10px" }}>
+              EXACT
+            </p>
           </div>
 
-          {/* User Name and Dropdown on the right */}
+          {/* User Dropdown Menu */}
           <Space>
             {userName && (
               <a
@@ -151,14 +162,9 @@ const ExactLayout = () => {
             )}
           </Space>
 
-          {/* MUI Menu for the dropdown */}
-          <MuiMenu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleCloseMenu}
-            defaultSelectedKeys={["1"]}
-          >
-            <MenuItem onClick={handleCloseMenu} key="1">
+          {/* MUI Dropdown Menu */}
+          <MuiMenu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+            <MenuItem onClick={handleCloseMenu}>
               <ListItemIcon>
                 <Person fontSize="small" />
               </ListItemIcon>
@@ -178,6 +184,8 @@ const ExactLayout = () => {
             </MenuItem>
           </MuiMenu>
         </Header>
+
+        {/* Main Content Section */}
         <Content
           style={{
             margin: "24px 16px",
@@ -187,9 +195,16 @@ const ExactLayout = () => {
             borderRadius: borderRadiusLG,
           }}
         >
-          {/* This will render the nested routes here */}
           <Outlet />
         </Content>
+        <Footer
+          style={{
+            textAlign: 'center',
+            maxHeight:"5px"
+          }}
+        >
+          Copyright © {new Date().getFullYear()}  Exact. All Rights Reserved
+        </Footer>
       </Layout>
     </Layout>
   );
