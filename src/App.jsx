@@ -25,6 +25,9 @@ import AddProgrammeOutcome from "./components/PO/addPO";
 import AddCO from "./components/CourseOutcome/addCOs";
 import ManageCO from "./components/CourseOutcome/manageCOs";
 import EditCO from "./components/CourseOutcome/editCOs";
+import EditPSO from "./components/PSO/editPSO";
+import ManagePSO from "./components/PSO/managePSO";
+import AddPSOForm from "./components/PSO/addPSO";
 
 
 function App() {
@@ -55,11 +58,14 @@ function App() {
           <Route path="/manage-programmes" element={<ProtectedRoute element={<ManageProgrammes />} allowedRoles={['admin','teacher']} />} />
           <Route path="/add-pos" element={<ProtectedRoute element={<AddProgrammeOutcome />} allowedRoles={['admin','teacher']} />} />
 
-          <Route path="/add-cos" element={<ProtectedRoute element={<AddCO />} allowedRoles={['admin','teacher']} />} />
-          <Route path="/edit-cos" element={<ProtectedRoute element={<EditCO />} allowedRoles={['admin','teacher']} />} />
-          <Route path="/manage-cos" element={<ProtectedRoute element={<ManageCO />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/add-co" element={<ProtectedRoute element={<AddCO />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/edit-co/:coId" element={<ProtectedRoute element={<EditCO />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/manage-co" element={<ProtectedRoute element={<ManageCO />} allowedRoles={['admin','teacher']} />} />
 
- 
+          <Route path="/add-pso" element={<ProtectedRoute element={<AddPSOForm />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/edit-pso/:psoId" element={<ProtectedRoute element={<EditPSO />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/manage-pso" element={<ProtectedRoute element={<ManagePSO />} allowedRoles={['admin','teacher']} />} />
+
  
         </Route>
       </Routes>

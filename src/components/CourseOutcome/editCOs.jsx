@@ -10,6 +10,11 @@ import {
   InputLabel,
   FormControl,
   Box,
+  Typography,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  FormLabel,
 } from "@mui/material";
 
 const EditCO = () => {
@@ -18,57 +23,59 @@ const EditCO = () => {
     course: "",
     co_label: "",
     co_description: "",
-    remember: "",
-    understand: "",
-    apply: "",
-    analyze: "",
-    evaluate: "",
-    create: "",
+    bloom_taxonomy: "", // Store selected Bloom's taxonomy level
   });
   const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    // Fetch CO details
-    axios
-      .get(`http://localhost:8000/get-co/${coId}/`)
-      .then((response) => {
-        setFormData(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching CO data:", error);
-      });
+    const fetchData = async () => {
+      try {
+        // Fetch CO details using correct API endpoint
+        const coResponse = await axios.get(`http://localhost:8000/cos/${coId}/`);
+        setFormData(coResponse.data);
 
-    // Fetch courses list
-    axios
-      .get("http://localhost:8000/get-courses/")
-      .then((response) => {
-        setCourses(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching courses:", error);
-      });
+        // Fetch course list
+        const courseResponse = await axios.get("http://localhost:8000/get-courses/");
+        setCourses(courseResponse.data);
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to load data. Please try again.");
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [coId]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    axios
-      .put(`http://localhost:8000/update-co/${coId}/`, formData)
-      .then(() => {
-        navigate("/manage-co");
-      })
-      .catch((error) => {
-        console.error("Error updating CO:", error);
-      });
+    try {
+      await axios.put(`http://localhost:8000/cos/edit/${coId}/`, formData);
+      navigate("/manage-co");
+    } catch (err) {
+      console.error("Error updating CO:", err);
+      setError("Failed to update CO. Please try again.");
+    }
   };
+
+  if (loading) return <Typography>Loading...</Typography>;
+  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <Container maxWidth="sm" sx={{ mt: 5 }}>
-      <h2>Edit CO</h2>
+      <Typography variant="h4" align="center" gutterBottom>
+        Edit CO
+      </Typography>
+
       <form onSubmit={handleSubmit}>
         {/* Course Dropdown */}
         <FormControl fullWidth margin="normal">
@@ -84,7 +91,7 @@ const EditCO = () => {
               <em>Select Course</em>
             </MenuItem>
             {courses.map((course) => (
-              <MenuItem key={course.id} value={course.id}>
+              <MenuItem key={course.course_id} value={course.title}>
                 {course.title}
               </MenuItem>
             ))}
@@ -115,22 +122,24 @@ const EditCO = () => {
           margin="normal"
         />
 
-        {/* Bloom's Taxonomy Fields */}
-        {["remember", "understand", "apply", "analyze", "evaluate", "create"].map(
-          (field) => (
-            <TextField
-              key={field}
-              fullWidth
-              label={field.charAt(0).toUpperCase() + field.slice(1)}
-              name={field}
-              type="number"
-              value={formData[field]}
-              onChange={handleChange}
-              required
-              margin="normal"
-            />
-          )
-        )}
+        {/* Bloom's Taxonomy Radio Buttons */}
+        <FormControl component="fieldset" margin="normal" required>
+          <FormLabel component="legend">Select Bloom's Taxonomy Level</FormLabel>
+          <RadioGroup
+            name="bloom_taxonomy"
+            value={formData.bloom_taxonomy}
+            onChange={handleChange}
+          >
+            {["remember", "understand", "apply", "analyze", "evaluate", "create"].map((level) => (
+              <FormControlLabel
+                key={level}
+                value={level}
+                control={<Radio />}
+                label={level.charAt(0).toUpperCase() + level.slice(1)}
+              />
+            ))}
+          </RadioGroup>
+        </FormControl>
 
         {/* Buttons */}
         <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
