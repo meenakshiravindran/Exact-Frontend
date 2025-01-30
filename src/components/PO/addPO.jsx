@@ -35,7 +35,7 @@ const AddProgrammeOutcome = () => {
     try {
       await axios.post("http://localhost:8000/add-pos/", formData);
       alert("Programme Outcome added successfully.");
-    //   navigate("/manage-programme-outcomes");
+      navigate("/manage-pos");
     } catch (error) {
       if (error.response && error.response.data) {
         setErrors(error.response.data);

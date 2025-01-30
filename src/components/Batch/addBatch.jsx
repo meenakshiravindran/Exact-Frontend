@@ -10,6 +10,8 @@ import {
   Select,
   FormControl,
   InputLabel,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -71,7 +73,7 @@ const BatchForm = () => {
         part: "",
         active: false,
       });
-      navigate('/manage-batches');
+      navigate("/manage-batches");
       setErrors({});
     } catch (error) {
       if (error.response && error.response.data) {
@@ -175,17 +177,17 @@ const BatchForm = () => {
         />
 
         {/* Active Checkbox */}
-        <Box display="flex" alignItems="center" margin="normal">
-          <input
-            type="checkbox"
-            name="active"
-            checked={formData.active}
-            onChange={handleChange}
+          <FormControlLabel
+            control={
+              <Checkbox
+                id="active"
+                name="active"
+                checked={formData.active}
+                onChange={handleChange}
+              />
+            }
+            label="Active"
           />
-          <Typography variant="body1" sx={{ ml: 1 }}>
-            Active
-          </Typography>
-        </Box>
 
         {/* Submit Button */}
         <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
