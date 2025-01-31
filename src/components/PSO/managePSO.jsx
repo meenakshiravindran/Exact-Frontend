@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import {
   Button,
   Container,
@@ -18,70 +19,73 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Link } from "react-router-dom";
 
-const ManageProgrammeOutcomes = () => {
-  const [pos, setPos] = useState([]);
-  const [levels, setLevels] = useState([]);
-  const [selectedLevel, setSelectedLevel] = useState("");
-  const [open, setOpen] = useState(false);
-  const [selectedPoId, setSelectedPoId] = useState(null);
+const ManagePSO = () => {
+  const [programmes, setProgrammes] = useState([]); // List of Programmes
+  const [selectedProgramme, setSelectedProgramme] = useState(""); // Selected Programme
+  const [psos, setPsos] = useState([]); // List of PSOs
+  const [open, setOpen] = useState(false); // Dialog State
+  const [selectedPsoId, setSelectedPsoId] = useState(null); // PSO ID for Deletion
 
+  // Fetch All Programmes
   useEffect(() => {
     axios
-      .get("http://localhost:8000/get-level/")
+      .get("http://localhost:8000/get-programme/")
       .then((response) => {
-        setLevels(response.data);
+        setProgrammes(response.data);
       })
       .catch((error) => {
-        console.error("Error fetching levels:", error);
+        console.error("Error fetching programme data:", error);
       });
   }, []);
 
+  // Fetch PSOs based on Selected Programme
   useEffect(() => {
-    if (selectedLevel) {
+    if (selectedProgramme) {
       axios
-        .get(`http://localhost:8000/get-pos/${selectedLevel}`)
+        .get(`http://localhost:8000/psos/by-programme/${selectedProgramme}/`)
         .then((response) => {
-          setPos(response.data);
+          setPsos(response.data);
         })
         .catch((error) => {
-          console.error("Error fetching POs:", error);
+          console.error("Error fetching PSO data:", error);
         });
+    } else {
+      setPsos([]); // Clear PSOs if no programme is selected
     }
-  }, [selectedLevel]);
+  }, [selectedProgramme]);
 
   const handleDelete = () => {
     axios
-      .delete(`http://localhost:8000/pos/delete/${selectedPoId}/`)
+      .delete(`http://localhost:8000/pso/delete/${selectedPsoId}/`)
       .then(() => {
-        setPos(pos.filter((po) => po.id !== selectedPoId));
+        setPsos(psos.filter((pso) => pso.pso_id !== selectedPsoId));
         setOpen(false);
       })
       .catch((error) => {
-        console.error("Error deleting PO:", error);
+        console.error("Error deleting PSO:", error);
       });
   };
 
-  const handleDialogOpen = (poId) => {
-    setSelectedPoId(poId);
+  const handleDialogOpen = (psoId) => {
+    setSelectedPsoId(psoId);
     setOpen(true);
   };
 
   const handleDialogClose = () => {
     setOpen(false);
-    setSelectedPoId(null);
+    setSelectedPsoId(null);
   };
 
-  const rows = pos.map((po) => ({
-    id: po.id,
-    po_label:po.po_label,
-    pos_description: po.pos_description,
+  const rows = psos.map((pso) => ({
+    id: pso.pso_id,
+    pso_name: pso.pso_label,
+    description: pso.pso_desc,
   }));
 
   const columns = [
-    { field: "po_label", headerName: "Label", flex: 0.3 },
-    { field: "pos_description", headerName: "Description", flex: 0.5 },
+    { field: "pso_name", headerName: "PSO Label", flex: 0.4 },
+    { field: "description", headerName: "Description", flex: 0.4 },
     {
       field: "actions",
       headerName: "Actions",
@@ -91,13 +95,13 @@ const ManageProgrammeOutcomes = () => {
       sortable: false,
       renderCell: (params) => (
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <Link to={`/edit-pos/${params.row.id}`}>
+          <Link to={`/edit-pso/${params.row.id}`}>
             <IconButton color="primary" size="small" sx={{ marginRight: 1 }}>
               <EditIcon />
             </IconButton>
           </Link>
           <IconButton
-            color="error"
+            color="secondary"
             size="small"
             onClick={() => handleDialogOpen(params.row.id)}
           >
@@ -111,44 +115,47 @@ const ManageProgrammeOutcomes = () => {
   return (
     <Container sx={{ marginTop: 5 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <h2>Manage Programme Outcomes</h2>
+        <h2>Manage PSOs</h2>
         <Box>
-          <Link to="/add-pos">
+          <Link to="/add-pso">
             <Button variant="contained" color="success">
-              Add New PO
+              Add New PSO
             </Button>
           </Link>
         </Box>
       </Box>
 
+      {/* Select Programme Dropdown */}
       <FormControl fullWidth margin="normal">
-        <InputLabel id="level-label">Select Level</InputLabel>
+        <InputLabel id="programme-label">Select Programme</InputLabel>
         <Select
-          labelId="level-label"
-          label="Select Level"
-          value={selectedLevel}
-          onChange={(e) => setSelectedLevel(e.target.value)}
+          labelId="programme-label"
+          label="Select Programme"
+          value={selectedProgramme}
+          onChange={(e) => setSelectedProgramme(e.target.value)}
         >
           <MenuItem value="">
-            <em>All Levels</em>
+            <em>All Programmes</em>
           </MenuItem>
-          {levels.map((level) => (
-            <MenuItem key={level.level_id} value={level.level_id}>
-              {level.level_name}
+          {programmes.map((prog) => (
+            <MenuItem key={prog.programme_id} value={prog.programme_id}>
+              {prog.programme_name}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
 
+      {/* PSO DataGrid */}
       <div style={{ height: 400, width: "100%" }}>
         <DataGrid rows={rows} columns={columns} pageSize={5} />
       </div>
 
+      {/* Confirmation Dialog */}
       <Dialog open={open} onClose={handleDialogClose}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this Programme Outcome? This action cannot be undone.
+            Are you sure you want to delete this PSO? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -164,4 +171,4 @@ const ManageProgrammeOutcomes = () => {
   );
 };
 
-export default ManageProgrammeOutcomes;
+export default ManagePSO;
