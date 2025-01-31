@@ -10,10 +10,9 @@ import {
   Select,
   FormControl,
   InputLabel,
-  Radio,
-  RadioGroup,
+  FormGroup,
   FormControlLabel,
-  FormLabel,
+  Checkbox,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -22,14 +21,13 @@ const AddCO = () => {
     course: "",
     co_label: "",
     co_description: "",
-    bloom_taxonomy: "", // Single field for Bloom's Taxonomy selection
+    bloom_taxonomy: [], // Now an array to store multiple selections
   });
 
   const [errors, setErrors] = useState({});
   const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
 
-  // Fetch courses on component mount
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -39,12 +37,22 @@ const AddCO = () => {
         console.error("Error fetching courses:", error);
       }
     };
-
     fetchCourses();
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      bloom_taxonomy: checked
+        ? [...prevState.bloom_taxonomy, value]
+        : prevState.bloom_taxonomy.filter((item) => item !== value),
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -56,7 +64,7 @@ const AddCO = () => {
         course: "",
         co_label: "",
         co_description: "",
-        bloom_taxonomy: "",
+        bloom_taxonomy: [],
       });
       navigate("/manage-co");
       setErrors({});
@@ -84,7 +92,6 @@ const AddCO = () => {
           Add CO
         </Typography>
 
-        {/* Course Dropdown */}
         <FormControl fullWidth margin="normal" error={!!errors.course}>
           <InputLabel id="course-label">Course</InputLabel>
           <Select
@@ -110,7 +117,6 @@ const AddCO = () => {
           )}
         </FormControl>
 
-        {/* CO Label Input */}
         <TextField
           fullWidth
           label="CO Label"
@@ -122,7 +128,6 @@ const AddCO = () => {
           margin="normal"
         />
 
-        {/* CO Description Input */}
         <TextField
           fullWidth
           label="CO Description"
@@ -136,21 +141,30 @@ const AddCO = () => {
           margin="normal"
         />
 
-        {/* Bloom's Taxonomy Selection (Only One Can Be Selected) */}
         <FormControl component="fieldset" margin="normal" error={!!errors.bloom_taxonomy}>
-          <FormLabel component="legend">Select Bloom's Taxonomy Level</FormLabel>
-          <RadioGroup
-            name="bloom_taxonomy"
-            value={formData.bloom_taxonomy}
-            onChange={handleChange}
-          >
-            <FormControlLabel value="remember" control={<Radio />} label="Remember" />
-            <FormControlLabel value="understand" control={<Radio />} label="Understand" />
-            <FormControlLabel value="apply" control={<Radio />} label="Apply" />
-            <FormControlLabel value="analyze" control={<Radio />} label="Analyze" />
-            <FormControlLabel value="evaluate" control={<Radio />} label="Evaluate" />
-            <FormControlLabel value="create" control={<Radio />} label="Create" />
-          </RadioGroup>
+          <Typography variant="h6">Select Bloom's Taxonomy Levels</Typography>
+          <FormGroup>
+            {[
+              "remember",
+              "understand",
+              "apply",
+              "analyze",
+              "evaluate",
+              "create",
+            ].map((level) => (
+              <FormControlLabel
+                key={level}
+                control={
+                  <Checkbox
+                    checked={formData.bloom_taxonomy.includes(level)}
+                    onChange={handleCheckboxChange}
+                    value={level}
+                  />
+                }
+                label={level.charAt(0).toUpperCase() + level.slice(1)}
+              />
+            ))}
+          </FormGroup>
           {errors.bloom_taxonomy && (
             <Typography variant="caption" color="error">
               {errors.bloom_taxonomy}
@@ -158,7 +172,6 @@ const AddCO = () => {
           )}
         </FormControl>
 
-        {/* Submit Button */}
         <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
           <Button
             variant="outlined"

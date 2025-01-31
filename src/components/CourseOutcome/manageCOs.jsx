@@ -36,11 +36,15 @@ const ManageCO = () => {
     id: co.co_id,
     label: co.co_label,
     description: co.co_description,
+    course:co.course,
+    programme:co.programme
   }));
 
   const columns = [
     { field: 'label', headerName: 'CO Label', flex: 0.3 },
     { field: 'description', headerName: 'Description', flex: 0.5 },
+    { field: 'course', headerName: 'Course', flex: 0.5 },
+    { field: 'programme', headerName: 'Programme', flex: 0.5 },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -87,6 +91,7 @@ const ManageCO = () => {
           rows={rows}
           columns={columns}
           pageSize={5}
+          pagination
         />
       </div>
     </Container>
