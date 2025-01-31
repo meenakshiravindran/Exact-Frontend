@@ -20,7 +20,6 @@
     "@mui/x-data-grid": "^7.24.1",
     "antd": "^5.23.2",
     "axios": "^1.7.9",
-    "better-react-mathjax": "^2.0.4-beta1",
     "bootstrap": "^5.3.3",
     "katex": "^0.16.21",
     "react": "^18.3.1",
