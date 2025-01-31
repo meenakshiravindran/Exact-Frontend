@@ -12,8 +12,7 @@ import {
   Box,
   Typography,
   FormControlLabel,
-  Radio,
-  RadioGroup,
+  Checkbox,
   FormLabel,
 } from "@mui/material";
 
@@ -23,8 +22,16 @@ const EditCO = () => {
     course: "",
     co_label: "",
     co_description: "",
-    bloom_taxonomy: "", // Store selected Bloom's taxonomy level
+    bloom_taxonomy: {
+      remember: 0,
+      understand: 0,
+      apply: 0,
+      analyze: 0,
+      evaluate: 0,
+      create: 0,
+    },
   });
+
   const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -33,9 +40,19 @@ const EditCO = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch CO details using correct API endpoint
+        // Fetch CO details
         const coResponse = await axios.get(`http://localhost:8000/cos/${coId}/`);
-        setFormData(coResponse.data);
+        setFormData({
+          ...coResponse.data,
+          bloom_taxonomy: coResponse.data.bloom_taxonomy || {
+            remember: 0,
+            understand: 0,
+            apply: 0,
+            analyze: 0,
+            evaluate: 0,
+            create: 0,
+          },
+        });
 
         // Fetch course list
         const courseResponse = await axios.get("http://localhost:8000/get-courses/");
@@ -52,10 +69,24 @@ const EditCO = () => {
     fetchData();
   }, [coId]);
 
+  // Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle checkbox changes for Bloom's Taxonomy
+  const handleCheckboxChange = (event) => {
+    const { name, checked } = event.target;
+    setFormData((prev) => ({
+      ...prev,
+      bloom_taxonomy: {
+        ...prev.bloom_taxonomy,
+        [name]: checked ? 1 : 0, // Set 1 if checked, otherwise 0
+      },
+    }));
+  };
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -122,23 +153,26 @@ const EditCO = () => {
           margin="normal"
         />
 
-        {/* Bloom's Taxonomy Radio Buttons */}
-        <FormControl component="fieldset" margin="normal" required>
+        {/* Bloom's Taxonomy Checkboxes */}
+        <FormControl component="fieldset" margin="normal">
           <FormLabel component="legend">Select Bloom's Taxonomy Level</FormLabel>
-          <RadioGroup
-            name="bloom_taxonomy"
-            value={formData.bloom_taxonomy}
-            onChange={handleChange}
-          >
-            {["remember", "understand", "apply", "analyze", "evaluate", "create"].map((level) => (
-              <FormControlLabel
-                key={level}
-                value={level}
-                control={<Radio />}
-                label={level.charAt(0).toUpperCase() + level.slice(1)}
-              />
-            ))}
-          </RadioGroup>
+          <Box>
+            {["remember", "understand", "apply", "analyze", "evaluate", "create"].map(
+              (level) => (
+                <FormControlLabel
+                  key={level}
+                  control={
+                    <Checkbox
+                      name={level}
+                      checked={formData.bloom_taxonomy[level] === 1}
+                      onChange={handleCheckboxChange}
+                    />
+                  }
+                  label={level.charAt(0).toUpperCase() + level.slice(1)}
+                />
+              )
+            )}
+          </Box>
         </FormControl>
 
         {/* Buttons */}

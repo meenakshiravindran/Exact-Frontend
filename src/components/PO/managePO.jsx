@@ -97,7 +97,7 @@ const ManageProgrammeOutcomes = () => {
             </IconButton>
           </Link>
           <IconButton
-            color="danger"
+            color="error"
             size="small"
             onClick={() => handleDialogOpen(params.row.id)}
           >

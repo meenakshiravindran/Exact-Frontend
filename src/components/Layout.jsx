@@ -63,9 +63,9 @@ const ExactLayout = () => {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        breakpoint="md"  // Added responsive breakpoint
-        collapsedWidth="0"  // Set collapsed width to 0
-        onBreakpoint={(broken) => setCollapsed(broken)}  // Toggle collapse state based on screen width
+        // breakpoint="md"  // Added responsive breakpoint
+        // collapsedWidth="0"  // Set collapsed width to 0
+        // onBreakpoint={(broken) => setCollapsed(broken)}  // Toggle collapse state based on screen width
         style={{
           overflow: "auto",
           height: "100vh",
@@ -164,13 +164,19 @@ const ExactLayout = () => {
                 key="7"
                 icon={<ProjectOutlined style={{ fontSize: "20px" }} />}
               >
-                <Link to="/manage-cos">CO's</Link>
+                <Link to="/manage-co">CO's</Link>
               </Menu.Item>
               <Menu.Item
                 key="8"
                 icon={<ProjectOutlined style={{ fontSize: "20px" }} />}
               >
                 <Link to="/manage-pos">PO's</Link>
+              </Menu.Item>
+              <Menu.Item
+                key="9"
+                icon={<ProjectOutlined style={{ fontSize: "20px" }} />}
+              >
+                <Link to="/manage-pso">PSO's</Link>
               </Menu.Item>
             </Menu.SubMenu>
           </Menu.SubMenu>
