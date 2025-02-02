@@ -30,7 +30,8 @@ import AddPSOForm from "./components/PSO/addPSO";
 import ManageProgrammeOutcomes from "./components/PO/managePO";
 import EditPO from "./components/PO/editPO";
 import QuestionForm from "./components/Questions/addQuestion";
-import { CreateInternalExam } from "./components/Questions/addInternalExam";
+import { InternalExamList } from "./components/Questions/manageInternalExam";
+import CreateInternalExam from "./components/Questions/addInternalExam";
 
 
 function App() {
@@ -76,7 +77,7 @@ function App() {
 
           <Route path="/add-question" element={<ProtectedRoute element={<QuestionForm />} allowedRoles={['teacher']} />} />
           <Route path="/internal-exam/:batchId" element={<ProtectedRoute element={<CreateInternalExam/>} allowedRoles={['teacher']} />}/>
-
+          <Route path="/manage-internal-exam" element={<ProtectedRoute element={<InternalExamList/>} allowedRoles={['teacher']} />}/>
           
  
  

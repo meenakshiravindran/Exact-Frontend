@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Typography } from "@mui/material";
 import axios from "axios";
-import { Box, TextField, Button, Typography, Card, CardContent } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-export const CreateInternalExam = () => {
-  const { batchId } = useParams();
+const CreateInternalExam = ({ open, onClose, batchId }) => {
   const navigate = useNavigate();
 
   const [examName, setExamName] = useState("");
@@ -29,6 +28,7 @@ export const CreateInternalExam = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
+      onClose(); // Close the dialog after submission
       navigate("/");
     } catch (err) {
       console.error("Error creating internal exam:", err);
@@ -37,55 +37,57 @@ export const CreateInternalExam = () => {
   };
 
   return (
-    <Box display="flex" sx={{justifyContent:"center", alignItems:"center"}} >
-      <Card sx={{ minWidth: { md: "500px", sm: "400px" }, width: "50%", padding: "2rem", boxShadow: 3}}>
-        <CardContent>
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
-            Create Internal Exam
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Create Internal Exam</DialogTitle>
+      <DialogContent>
+        {error && (
+          <Typography color="error" sx={{ mb: 2 }}>
+            {error}
           </Typography>
+        )}
 
-          {error && (
-            <Typography color="error" sx={{ mb: 2 }}>
-              {error}
-            </Typography>
-          )}
-
-          <form onSubmit={handleSubmit}>
-            <TextField
-              label="Internal Exam Name (e.g., IA1, IA2)"
-              fullWidth
-              variant="outlined"
-              value={examName}
-              onChange={(e) => setExamName(e.target.value)}
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Duration (minutes)"
-              fullWidth
-              variant="outlined"
-              type="number"
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Maximum Marks"
-              fullWidth
-              variant="outlined"
-              type="number"
-              value={maxMarks}
-              onChange={(e) => setMaxMarks(e.target.value)}
-              required
-              sx={{ mb: 2 }}
-            />
-            <Button type="submit" fullWidth variant="contained">
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Internal Exam Name (e.g., IA1, IA2)"
+            fullWidth
+            variant="outlined"
+            value={examName}
+            onChange={(e) => setExamName(e.target.value)}
+            required
+            sx={{ mb: 2,mt:2 }}
+          />
+          <TextField
+            label="Duration (minutes)"
+            fullWidth
+            variant="outlined"
+            type="number"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            required
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Maximum Marks"
+            fullWidth
+            variant="outlined"
+            type="number"
+            value={maxMarks}
+            onChange={(e) => setMaxMarks(e.target.value)}
+            required
+            sx={{ mb: 2 }}
+          />
+          <DialogActions>
+            <Button onClick={onClose} color="primary">
+              Cancel
+            </Button>
+            <Button type="submit" color="primary" variant="contained">
               Create Exam
             </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </Box>
+          </DialogActions>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
+
+export default CreateInternalExam;

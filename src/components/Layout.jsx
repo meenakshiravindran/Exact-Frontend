@@ -11,17 +11,15 @@ import {
   TeamOutlined,
   FieldTimeOutlined,
   ProjectOutlined,
+  FileTextOutlined,
+  FormOutlined,
 } from "@ant-design/icons";
 
 import { Button, Layout, Menu, theme } from "antd";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { Menu as MuiMenu, MenuItem, ListItemIcon } from "@mui/material";
 import { Space } from "antd/es";
-import {
-  Person,
-  AccountCircle,
-  ExitToApp,
-} from "@mui/icons-material";
+import { Person, AccountCircle, ExitToApp } from "@mui/icons-material";
 import "../index.css";
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -180,6 +178,18 @@ const ExactLayout = () => {
               </Menu.Item>
             </Menu.SubMenu>
           </Menu.SubMenu>
+          <Menu.SubMenu
+            key="sub3"
+            icon={<FileTextOutlined style={{ fontSize: "20px" }} />} 
+            title="Assessment"
+          >
+            <Menu.Item
+              key="10"
+              icon={<FormOutlined style={{ fontSize: "20px" }} />}
+            >
+              <Link to="/manage-internal-exam">Internal Exams</Link>
+            </Menu.Item>
+          </Menu.SubMenu>
         </Menu>
       </Sider>
 
@@ -210,10 +220,12 @@ const ExactLayout = () => {
               }}
             />
             <p
+               onClick={() => navigate('/')}
               style={{
                 fontSize: "24px",
                 fontWeight: "bold",
                 marginLeft: "10px",
+                cursor:"pointer"
               }}
             >
               EXACT
