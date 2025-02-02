@@ -56,7 +56,7 @@ function App() {
           <Route path="/manage-courses" element={<ProtectedRoute element={<ManageCourses />} allowedRoles={['admin','teacher']} />} />
           <Route path="/edit-batch/:batchId" element={<ProtectedRoute element={<EditBatch />} allowedRoles={['admin','teacher']} />} />
           <Route path="/manage-batches" element={<ProtectedRoute element={<ManageBatches />} allowedRoles={['admin','teacher']} />} />
-          <Route path="/edit-programme/:programmeId" element={<ProtectedRoute element={<EditProgramme />} allowedRoles={['admin']} />} />
+          <Route path="/edit-programme/:programmeId" element={<ProtectedRoute element={<EditProgramme />} allowedRoles={['admin','teacher']} />} />
           <Route path="/manage-programmes" element={<ProtectedRoute element={<ManageProgrammes />} allowedRoles={['admin','teacher']} />} />
           <Route path="/add-pos" element={<ProtectedRoute element={<AddProgrammeOutcome />} allowedRoles={['admin','teacher']} />} />
           <Route path="/manage-pos" element={<ProtectedRoute element={<ManageProgrammeOutcomes />} allowedRoles={['admin','teacher']} />} />
@@ -73,7 +73,7 @@ function App() {
           <Route path="/manage-pso" element={<ProtectedRoute element={<ManagePSO />} allowedRoles={['admin','teacher']} />} />
 
 
-          <Route path="/add-question" element={<ProtectedRoute element={<QuestionForm />} allowedRoles={['admin','teacher']} />} />
+          <Route path="/add-question" element={<ProtectedRoute element={<QuestionForm />} allowedRoles={['teacher']} />} />
           
  
  
