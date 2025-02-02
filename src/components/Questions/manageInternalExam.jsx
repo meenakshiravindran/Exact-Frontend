@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import axios from "axios"
 import {
   Box,
   Typography,
@@ -13,129 +13,142 @@ import {
   DialogActions,
   Select,
   MenuItem,
-} from "@mui/material";
-import CreateInternalExam from "./addInternalExam";
+  Container,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material"
+import {
+  Add as AddIcon,
+  School as SchoolIcon,
+  AccessTime as AccessTimeIcon,
+  Grade as GradeIcon,
+} from "@mui/icons-material"
+import CreateInternalExam from "./addInternalExam"
 
 export const InternalExamList = () => {
-  const [exams, setExams] = useState([]);
-  const [batches, setBatches] = useState([]);
-  const [selectedBatch, setSelectedBatch] = useState("");
-  const [openDialog, setOpenDialog] = useState(false);
-  const [openCreateExamDialog, setOpenCreateExamDialog] = useState(false); // Manage the state for Create Exam dialog
-  const [batchForCreateExam, setBatchForCreateExam] = useState(null); // To store the selected batch for creating exam
-  const navigate = useNavigate();
-  const accessToken = localStorage.getItem("access_token");
+  const [exams, setExams] = useState([])
+  const [batches, setBatches] = useState([])
+  const [combinedData, setCombinedData] = useState([])
+  const [selectedBatch, setSelectedBatch] = useState("")
+  const [openDialog, setOpenDialog] = useState(false)
+  const [openCreateExamDialog, setOpenCreateExamDialog] = useState(false)
+  const [batchForCreateExam, setBatchForCreateExam] = useState(null)
+  const navigate = useNavigate()
+  const accessToken = localStorage.getItem("access_token")
 
-  // Fetch faculty batches on initial render
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+
+  // Fetch exams and batches
   useEffect(() => {
-    const fetchBatches = async () => {
+    const fetchData = async () => {
       try {
-        const { data } = await axios.get(
-          "http://localhost:8000/faculty-batches/",
-          {
+        const [examRes, batchRes] = await Promise.all([
+          axios.get("http://localhost:8000/get-internal-exams/", {
             headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        );
-        setBatches(data);
-      } catch (error) {
-        console.error("Error fetching faculty batches:", error);
-      }
-    };
-
-    fetchBatches();
-
-    // Fetch internal exams only when faculty batches are already fetched
-    const fetchExams = async () => {
-      try {
-        const { data } = await axios.get(
-          "http://localhost:8000/get-internal-exams/",
-          {
+          }),
+          axios.get("http://localhost:8000/faculty-batches/", {
             headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        );
-        setExams(data);
+          }),
+        ])
+
+        setExams(examRes.data)
+        setBatches(batchRes.data)
+
+        // Combine exams with batch data (assuming each exam has a batch_id field)
+        const combined = examRes.data.map((exam, index) => ({
+          ...exam,
+          batch: batchRes.data[index % batchRes.data.length], // Distribute exams among batches
+        }))
+
+        setCombinedData(combined)
       } catch (error) {
-        console.error("Error fetching internal exams:", error);
+        console.error("Error fetching data:", error)
       }
-    };
-
-    fetchExams();
-  }, [accessToken]); // Only trigger fetches on initial render
-
-  // Fetch faculty batches when dialog opens
-  const handleOpenDialog = async () => {
-    try {
-      const { data } = await axios.get(
-        "http://localhost:8000/faculty-batches/",
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
-      setBatches(data);
-      setOpenDialog(true);
-    } catch (error) {
-      console.error("Error fetching faculty batches:", error);
     }
-  };
+
+    fetchData()
+  }, [accessToken])
+
+  // Open batch selection dialog
+  const handleOpenDialog = () => {
+    setOpenDialog(true)
+  }
 
   // Handle selecting a batch and opening the create exam dialog
   const handleProceed = () => {
     if (selectedBatch) {
-      setBatchForCreateExam(selectedBatch); // Set the selected batch
-      setOpenDialog(false); // Close the current dialog
-      setOpenCreateExamDialog(true); // Open the Create Exam dialog
+      setBatchForCreateExam(selectedBatch)
+      setOpenDialog(false)
+      setOpenCreateExamDialog(true)
     }
-  };
+  }
 
   return (
-    <Box sx={{ p: 4 }}>
-      {/* Header Section with Button on the Right */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
-        <Typography variant="h4">My Internal Exams</Typography>
-        <Button variant="contained" color="primary" onClick={handleOpenDialog}>
+    <Container maxWidth="100vw" sx={{ py: 4 }}>
+      {/* Header Section */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4" component="h1">
+          My Internal Exams
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleOpenDialog}
+          startIcon={<AddIcon />}
+          sx={{ borderRadius: 20 }}
+        >
           Create Question Paper
         </Button>
       </Box>
 
-      {/* Grid for displaying exams */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: 2,
-        }}
-      >
-        {exams.map((exam) => (
-          <Card key={exam.int_exam_id} sx={{ minHeight: 140 }}>
-            <CardContent>
-              <Typography variant="h6">{exam.exam_name}</Typography>
-              <Typography>Duration: {exam.duration} mins</Typography>
-              <Typography>Max Marks: {exam.max_marks}</Typography>
+      {/* Box for Exam Cards */}
+      <Box display="flex" flexWrap="wrap" gap={3}>
+        {combinedData.map((exam) => (
+          <Card
+            key={exam.int_exam_id}
+            sx={{
+              width: "100%",
+              maxWidth: 345,
+              height: "auto",
+              display: "flex",
+              flexDirection: "column",
+              transition: "0.3s",
+              "&:hover": { transform: "translateY(-5px)", boxShadow: 4 },
+            }}
+          >
+            <CardContent sx={{ flexGrow: 1 }}>
+              <Typography variant="h6" component="h2" gutterBottom>
+                {exam.exam_name}
+              </Typography>
+              <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                {exam.batch.course__title}
+              </Typography>
+              <Box display="flex" alignItems="center" mb={1}>
+                <SchoolIcon fontSize="small" sx={{ mr: 1, color: "primary.main" }} />
+                <Typography variant="body2">
+                  Year: {exam.batch.year}, Part: {exam.batch.part}
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="center" mb={1}>
+                <AccessTimeIcon fontSize="small" sx={{ mr: 1, color: "secondary.main" }} />
+                <Typography variant="body2">Duration: {exam.duration} mins</Typography>
+              </Box>
+              <Box display="flex" alignItems="center">
+                <GradeIcon fontSize="small" sx={{ mr: 1, color: "success.main" }} />
+                <Typography variant="body2">Max Marks: {exam.max_marks}</Typography>
+              </Box>
             </CardContent>
           </Card>
         ))}
       </Box>
 
-      {/* Dialog for selecting batch */}
-      <Dialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        maxWidth="sm"
-        fullWidth
-      >
+      {/* Batch Selection Dialog */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Select a Batch</DialogTitle>
         <DialogContent>
-          <Box sx={{ minWidth: "500px", p: 2 }}>
-            <Select
-              fullWidth
-              value={selectedBatch}
-              onChange={(e) => setSelectedBatch(e.target.value)}
-            >
+          <Box sx={{ minWidth: "100%", p: 2 }}>
+            <Select fullWidth value={selectedBatch} onChange={(e) => setSelectedBatch(e.target.value)}>
               {batches.map((batch) => (
                 <MenuItem key={batch.batch_id} value={batch.batch_id}>
                   {batch.course__title} - {batch.year} (Part {batch.part})
@@ -146,11 +159,7 @@ export const InternalExamList = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button
-            onClick={handleProceed} // Open the next dialog on proceed
-            variant="contained"
-            disabled={!selectedBatch}
-          >
+          <Button onClick={handleProceed} variant="contained" disabled={!selectedBatch}>
             Proceed
           </Button>
         </DialogActions>
@@ -159,9 +168,9 @@ export const InternalExamList = () => {
       {/* Create Internal Exam Dialog */}
       <CreateInternalExam
         open={openCreateExamDialog}
-        onClose={() => setOpenCreateExamDialog(false)} // Close the dialog
-        batchId={batchForCreateExam} // Pass the selected batch ID
+        onClose={() => setOpenCreateExamDialog(false)}
+        batchId={batchForCreateExam}
       />
-    </Box>
-  );
-};
+    </Container>
+  )
+}

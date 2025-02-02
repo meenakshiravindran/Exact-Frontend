@@ -178,18 +178,20 @@ const ExactLayout = () => {
               </Menu.Item>
             </Menu.SubMenu>
           </Menu.SubMenu>
-          <Menu.SubMenu
-            key="sub3"
-            icon={<FileTextOutlined style={{ fontSize: "20px" }} />} 
-            title="Assessment"
-          >
-            <Menu.Item
-              key="10"
-              icon={<FormOutlined style={{ fontSize: "20px" }} />}
+          {userRole === "teacher" && (
+            <Menu.SubMenu
+              key="sub3"
+              icon={<FileTextOutlined style={{ fontSize: "20px" }} />}
+              title="Assessment"
             >
-              <Link to="/manage-internal-exam">Internal Exams</Link>
-            </Menu.Item>
-          </Menu.SubMenu>
+              <Menu.Item
+                key="10"
+                icon={<FormOutlined style={{ fontSize: "20px" }} />}
+              >
+                <Link to="/manage-internal-exam">Internal Exams</Link>
+              </Menu.Item>
+            </Menu.SubMenu>
+          )}
         </Menu>
       </Sider>
 
@@ -220,12 +222,12 @@ const ExactLayout = () => {
               }}
             />
             <p
-               onClick={() => navigate('/')}
+              onClick={() => navigate("/")}
               style={{
                 fontSize: "24px",
                 fontWeight: "bold",
                 marginLeft: "10px",
-                cursor:"pointer"
+                cursor: "pointer",
               }}
             >
               EXACT
