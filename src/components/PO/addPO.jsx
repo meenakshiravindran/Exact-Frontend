@@ -105,7 +105,7 @@ const AddProgrammeOutcome = () => {
         </FormControl>
 
         <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
-          <Button variant="outlined" color="secondary" onClick={() => navigate("/manage-programme-outcomes")}>Back</Button>
+          <Button variant="outlined" color="secondary" onClick={() => navigate("/manage-pos")}>Back</Button>
           <Button variant="contained" type="submit">Submit</Button>
         </Box>
       </Box>

@@ -42,17 +42,10 @@ const QuestionForm = () => {
   };
 
   const handleSubmit = () => {
-    let formattedQuestion = question.trim();
-
-    // Automatically wrap plain text in LaTeX syntax
-    if (!formattedQuestion.includes("$")) {
-      formattedQuestion = `$${formattedQuestion}$`;
-    }
-
     const data = {
       course: course,
       co: co,
-      question_text: formattedQuestion,
+      question_text: question,
     };
 
     axios.post("http://localhost:8000/add-question/", data)

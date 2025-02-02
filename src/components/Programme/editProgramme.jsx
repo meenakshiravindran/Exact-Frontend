@@ -32,7 +32,7 @@ const EditProgramme = () => {
       .then((response) => {
         setFormData({
           programme_name: response.data.programme_name,
-          dept: response.data.dept, // Current department ID
+          dept: response.data.department, // Current department ID
           no_of_pos: response.data.no_of_pos,
           level: response.data.level, // Current level ID
           duration: response.data.duration,
