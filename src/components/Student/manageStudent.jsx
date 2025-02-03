@@ -37,19 +37,23 @@ const ManageStudents = () => {
         console.error("Error fetching programme data:", error);
       });
   }, []);
-
   useEffect(() => {
-    if (selectedProgramme) {
-      axios
-        .get(`http://localhost:8000/students/by-programme/${selectedProgramme}/`)
-        .then((response) => {
-          setStudents(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching student data:", error);
-        });
-    }
+    const fetchStudents = async () => {
+      try {
+        const response = await axios.get(
+          selectedProgramme
+            ? `http://localhost:8000/students/by-programme/${selectedProgramme}/`
+            : "http://localhost:8000/get-students/"
+        );
+        setStudents(response.data);
+      } catch (error) {
+        console.error("Error fetching student data:", error);
+      }
+    };
+  
+    fetchStudents();
   }, [selectedProgramme]);
+  
 
   const handleDelete = () => {
     axios
