@@ -21,15 +21,15 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { Link } from "react-router-dom";
 
 const ManageProgrammeOutcomes = () => {
-  const [pos, setPos] = useState([]);
-  const [levels, setLevels] = useState([]);
-  const [selectedLevel, setSelectedLevel] = useState("");
+  const [pos, setPos] = useState([]); // Programme Outcomes
+  const [levels, setLevels] = useState([]); // Levels dropdown data
+  const [selectedLevel, setSelectedLevel] = useState(""); // Selected level
   const [open, setOpen] = useState(false);
   const [selectedPoId, setSelectedPoId] = useState(null);
 
+  // Fetch all levels for dropdown
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/get-level/")
+    axios.get("http://localhost:8000/get-level/")
       .then((response) => {
         setLevels(response.data);
       })
@@ -38,22 +38,27 @@ const ManageProgrammeOutcomes = () => {
       });
   }, []);
 
+  // Fetch all POs initially and filter when level changes
   useEffect(() => {
-    if (selectedLevel) {
-      axios
-        .get(`http://localhost:8000/get-pos/${selectedLevel}`)
-        .then((response) => {
-          setPos(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching POs:", error);
-        });
-    }
-  }, [selectedLevel]);
+    const fetchPOs = async () => {
+      const url = selectedLevel
+        ? `http://localhost:8000/get-pos/${selectedLevel}/`
+        : `http://localhost:8000/get-pos/`; // Fetch all if no level is selected
 
+      try {
+        const response = await axios.get(url);
+        setPos(response.data);
+      } catch (error) {
+        console.error("Error fetching POs:", error);
+      }
+    };
+
+    fetchPOs();
+  }, [selectedLevel]); // Runs when selectedLevel changes
+
+  // Handle deletion
   const handleDelete = () => {
-    axios
-      .delete(`http://localhost:8000/pos/delete/${selectedPoId}/`)
+    axios.delete(`http://localhost:8000/pos/delete/${selectedPoId}/`)
       .then(() => {
         setPos(pos.filter((po) => po.id !== selectedPoId));
         setOpen(false);
@@ -63,22 +68,26 @@ const ManageProgrammeOutcomes = () => {
       });
   };
 
+  // Open delete confirmation dialog
   const handleDialogOpen = (poId) => {
     setSelectedPoId(poId);
     setOpen(true);
   };
 
+  // Close delete confirmation dialog
   const handleDialogClose = () => {
     setOpen(false);
     setSelectedPoId(null);
   };
 
+  // Map response data to DataGrid rows
   const rows = pos.map((po) => ({
     id: po.id,
-    po_label:po.po_label,
+    po_label: po.po_label,
     pos_description: po.pos_description,
   }));
 
+  // DataGrid columns
   const columns = [
     { field: "po_label", headerName: "Label", flex: 0.3 },
     { field: "pos_description", headerName: "Description", flex: 0.5 },
@@ -121,6 +130,7 @@ const ManageProgrammeOutcomes = () => {
         </Box>
       </Box>
 
+      {/* Level Filter Dropdown */}
       <FormControl fullWidth margin="normal">
         <InputLabel id="level-label">Select Level</InputLabel>
         <Select
@@ -140,10 +150,12 @@ const ManageProgrammeOutcomes = () => {
         </Select>
       </FormControl>
 
+      {/* DataGrid Table */}
       <div style={{ height: 400, width: "100%" }}>
         <DataGrid rows={rows} columns={columns} pageSize={5} />
       </div>
 
+      {/* Confirmation Dialog */}
       <Dialog open={open} onClose={handleDialogClose}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>

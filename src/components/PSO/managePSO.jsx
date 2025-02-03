@@ -39,21 +39,23 @@ const ManagePSO = () => {
       });
   }, []);
 
-  // Fetch PSOs based on Selected Programme
   useEffect(() => {
-    if (selectedProgramme) {
-      axios
-        .get(`http://localhost:8000/psos/by-programme/${selectedProgramme}/`)
-        .then((response) => {
-          setPsos(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching PSO data:", error);
-        });
-    } else {
-      setPsos([]); // Clear PSOs if no programme is selected
-    }
-  }, [selectedProgramme]);
+    const fetchPSOs = async () => {
+      const url = selectedProgramme
+        ? `http://localhost:8000/psos/by-programme/${selectedProgramme}/`
+        : `http://localhost:8000/get-psos/`; 
+  
+      try {
+        const response = await axios.get(url);
+        setPsos(response.data);
+      } catch (error) {
+        console.error("Error fetching PSOs:", error);
+      }
+    };
+  
+    fetchPSOs();
+  }, [selectedProgramme]); 
+  
 
   const handleDelete = () => {
     axios
