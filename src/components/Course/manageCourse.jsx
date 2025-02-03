@@ -12,7 +12,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -58,11 +58,13 @@ const ManageCourses = () => {
     id: course.course_id,
     title: course.title,
     department: course.dept,
+    programme:course.programme,
   }));
 
   const columns = [
     { field: 'title', headerName: 'Course Title', flex: 0.5 },
     { field: 'department', headerName: 'Department', flex: 0.3 },
+    { field: 'programme', headerName: 'Programme', flex: 0.3 },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -109,6 +111,7 @@ const ManageCourses = () => {
           rows={rows}
           columns={columns}
           pageSize={5}
+          slots={{ toolbar: GridToolbar }}
         />
       </div>
 
