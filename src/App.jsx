@@ -32,6 +32,7 @@ import EditPO from "./components/PO/editPO";
 import QuestionForm from "./components/Questions/addQuestion";
 import { InternalExamList } from "./components/Questions/manageInternalExam";
 import CreateInternalExam from "./components/Questions/addInternalExam";
+import ExamSectionPage from "./components/Exam/ExamSection";
 
 
 function App() {
@@ -78,9 +79,8 @@ function App() {
           <Route path="/add-question" element={<ProtectedRoute element={<QuestionForm />} allowedRoles={['teacher']} />} />
           <Route path="/internal-exam/:batchId" element={<ProtectedRoute element={<CreateInternalExam/>} allowedRoles={['teacher']} />}/>
           <Route path="/manage-internal-exam" element={<ProtectedRoute element={<InternalExamList/>} allowedRoles={['teacher']} />}/>
+          <Route path="/exam-section/:int_exam_id" element={<ProtectedRoute element={<ExamSectionPage/>} allowedRoles={['teacher']} />}/>
           
- 
- 
         </Route>
       </Routes>
     </BrowserRouter>
