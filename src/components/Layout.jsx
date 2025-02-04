@@ -11,37 +11,52 @@ import {
   TeamOutlined,
   FieldTimeOutlined,
   ProjectOutlined,
+  FileTextOutlined,
+  FormOutlined,
 } from "@ant-design/icons";
 
 import { Button, Layout, Menu, theme } from "antd";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Menu as MuiMenu, MenuItem, ListItemIcon } from "@mui/material";
 import { Space } from "antd/es";
-import {
-  Person,
-  AccountCircle,
-  ExitToApp,
-} from "@mui/icons-material";
+import { Person, AccountCircle, ExitToApp } from "@mui/icons-material";
 import "../index.css";
 
 const { Header, Sider, Content, Footer } = Layout;
 
 const ExactLayout = () => {
   const [userName, setUserName] = useState("");
-  const [userRole, setUserRole] = useState(""); // Store user role
+  const [userRole, setUserRole] = useState("");
   const [collapsed, setCollapsed] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  const getOpenKeys = () => {
+    if (currentPath.startsWith("/manage-")) {
+      if (currentPath.startsWith("/manage-internal-exam")) return ["sub3"];
+      if (
+        currentPath.startsWith("/manage-co") ||
+        currentPath.startsWith("/manage-pos") ||
+        currentPath.startsWith("/manage-pso")
+      ) {
+        return ["sub1", "sub2"]; // Expand both Manage & Attainment
+      }
+      return ["sub1"]; // Expand only Manage
+    }
+    return [];
+  };
 
   useEffect(() => {
     const storedFullName = localStorage.getItem("full_name");
-    const storedRole = localStorage.getItem("role"); // Get role from localStorage
+    const storedRole = localStorage.getItem("role");
 
     if (storedFullName) setUserName(storedFullName);
-    if (storedRole) setUserRole(storedRole); // Set role state
+    if (storedRole) setUserRole(storedRole);
   }, []);
 
   const handleLogout = () => {
@@ -63,9 +78,6 @@ const ExactLayout = () => {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        // breakpoint="md"  // Added responsive breakpoint
-        // collapsedWidth="0"  // Set collapsed width to 0
-        // onBreakpoint={(broken) => setCollapsed(broken)}  // Toggle collapse state based on screen width
         style={{
           overflow: "auto",
           height: "100vh",
@@ -110,47 +122,53 @@ const ExactLayout = () => {
         </div>
 
         {/* Sidebar Menu */}
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
+
+        <Menu
+          theme="dark"
+          mode="inline"
+          selectedKeys={[currentPath]} // Keeps selected item highlighted
+          defaultOpenKeys={getOpenKeys()} // Expands the relevant submenu on refresh
+        >
           <Menu.Item
-            key="1"
+            key="/"
             icon={<HomeOutlined style={{ fontSize: "20px" }} />}
           >
             <Link to="/">Home</Link>
           </Menu.Item>
+
           <Menu.SubMenu
             key="sub1"
             icon={<AppstoreAddOutlined style={{ fontSize: "20px" }} />}
             title="Manage"
           >
-            {/* This menu is only visible if the role is 'admin' */}
             {userRole === "admin" && (
               <Menu.Item
-                key="2"
+                key="/manage-faculties"
                 icon={<UsergroupAddOutlined style={{ fontSize: "20px" }} />}
               >
                 <Link to="/manage-faculties">Faculties</Link>
               </Menu.Item>
             )}
             <Menu.Item
-              key="3"
+              key="/manage-batches"
               icon={<ClusterOutlined style={{ fontSize: "20px" }} />}
             >
               <Link to="/manage-batches">Batch</Link>
             </Menu.Item>
             <Menu.Item
-              key="4"
+              key="/manage-courses"
               icon={<UnorderedListOutlined style={{ fontSize: "20px" }} />}
             >
               <Link to="/manage-courses">Courses</Link>
             </Menu.Item>
             <Menu.Item
-              key="5"
+              key="/manage-programmes"
               icon={<AppstoreAddOutlined style={{ fontSize: "20px" }} />}
             >
               <Link to="/manage-programmes">Programmes</Link>
             </Menu.Item>
             <Menu.Item
-              key="6"
+              key="/manage-students"
               icon={<TeamOutlined style={{ fontSize: "20px" }} />}
             >
               <Link to="/manage-students">Students</Link>
@@ -161,25 +179,40 @@ const ExactLayout = () => {
               title="Attainment"
             >
               <Menu.Item
-                key="7"
+                key="/manage-co"
                 icon={<ProjectOutlined style={{ fontSize: "20px" }} />}
               >
                 <Link to="/manage-co">CO's</Link>
               </Menu.Item>
               <Menu.Item
-                key="8"
+                key="/manage-pos"
                 icon={<ProjectOutlined style={{ fontSize: "20px" }} />}
               >
                 <Link to="/manage-pos">PO's</Link>
               </Menu.Item>
               <Menu.Item
-                key="9"
+                key="/manage-pso"
                 icon={<ProjectOutlined style={{ fontSize: "20px" }} />}
               >
                 <Link to="/manage-pso">PSO's</Link>
               </Menu.Item>
             </Menu.SubMenu>
           </Menu.SubMenu>
+
+          {userRole === "teacher" && (
+            <Menu.SubMenu
+              key="sub3"
+              icon={<FileTextOutlined style={{ fontSize: "20px" }} />}
+              title="Assessment"
+            >
+              <Menu.Item
+                key="/manage-internal-exam"
+                icon={<FormOutlined style={{ fontSize: "20px" }} />}
+              >
+                <Link to="/manage-internal-exam">Internal Exams</Link>
+              </Menu.Item>
+            </Menu.SubMenu>
+          )}
         </Menu>
       </Sider>
 
@@ -210,10 +243,12 @@ const ExactLayout = () => {
               }}
             />
             <p
+              onClick={() => navigate("/")}
               style={{
                 fontSize: "24px",
                 fontWeight: "bold",
                 marginLeft: "10px",
+                cursor: "pointer",
               }}
             >
               EXACT
