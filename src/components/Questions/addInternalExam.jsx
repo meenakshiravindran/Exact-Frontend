@@ -36,12 +36,13 @@ const CreateInternalExam = ({ open, onClose, batchId }) => {
     };
 
     try {
-      await axios.post("http://localhost:8000/add-internal-exam/", examData, {
+      const response = await axios.post("http://localhost:8000/add-internal-exam/", examData, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
-      onClose(); // Close the dialog after submission
-      navigate("/");
+      const createdExamId = response.data.data;
+      onClose();
+      navigate(`/exam-section/${createdExamId}`); // Navigate to new exam's section page
     } catch (err) {
       console.error("Error creating internal exam:", err);
       setError("Failed to create the internal exam. Please try again.");
@@ -52,62 +53,17 @@ const CreateInternalExam = ({ open, onClose, batchId }) => {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Create Internal Exam</DialogTitle>
       <DialogContent>
-        {error && (
-          <Typography color="error" sx={{ mb: 2 }}>
-            {error}
-          </Typography>
-        )}
-
+        {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
         <form onSubmit={handleSubmit}>
-          <TextField
-            label="Internal Exam Name (e.g., IA1, IA2)"
-            fullWidth
-            variant="outlined"
-            value={examName}
-            onChange={(e) => setExamName(e.target.value)}
-            required
-            sx={{ mb: 2, mt: 2 }}
-          />
+          <TextField label="Internal Exam Name" fullWidth variant="outlined" value={examName} onChange={(e) => setExamName(e.target.value)} required sx={{ mb: 2, mt: 2 }} />
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label="Exam Date"
-              fullWidth
-              sx={{
-                marginBottom:"15px"
-              }}
-              value={examDate}
-              onChange={(newDate) => setExamDate(newDate)}
-              renderInput={(params) => <TextField {...params} fullWidth sx={{ mb: 2 }} />}
-              required
-            />
+            <DatePicker label="Exam Date" fullWidth slotProps={{ textField: { fullWidth: true } }} sx={{ mb: 2 }} value={examDate} onChange={setExamDate} required />
           </LocalizationProvider>
-          <TextField
-            label="Duration (minutes)"
-            fullWidth
-            variant="outlined"
-            type="number"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            required
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            label="Maximum Marks"
-            fullWidth
-            variant="outlined"
-            type="number"
-            value={maxMarks}
-            onChange={(e) => setMaxMarks(e.target.value)}
-            required
-            sx={{ mb: 2 }}
-          />
+          <TextField label="Duration (minutes)" fullWidth variant="outlined" type="number" value={duration} onChange={(e) => setDuration(e.target.value)} required sx={{ mb: 2 }} />
+          <TextField label="Maximum Marks" fullWidth variant="outlined" type="number" value={maxMarks} onChange={(e) => setMaxMarks(e.target.value)} required sx={{ mb: 2 }} />
           <DialogActions>
-            <Button onClick={onClose} color="primary">
-              Cancel
-            </Button>
-            <Button type="submit" color="primary" variant="contained">
-              Create Exam
-            </Button>
+            <Button onClick={onClose} color="primary">Cancel</Button>
+            <Button type="submit" color="primary" variant="contained">Create Exam</Button>
           </DialogActions>
         </form>
       </DialogContent>

@@ -33,13 +33,10 @@ export const InternalExamList = () => {
   const [openDialog, setOpenDialog] = useState(false)
   const [openCreateExamDialog, setOpenCreateExamDialog] = useState(false)
   const [batchForCreateExam, setBatchForCreateExam] = useState(null)
-  const navigate = useNavigate()
   const accessToken = localStorage.getItem("access_token")
 
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
-  // Fetch exams and batches
   useEffect(() => {
     const fetchData = async () => {
       try {
