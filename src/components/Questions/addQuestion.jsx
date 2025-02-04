@@ -1,89 +1,101 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Box, Typography, Button, TextField, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+import { useState, useEffect, useRef } from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Tooltip,
+  Zoom,
+} from "@mui/material";
 import axios from "axios";
 import katex from "katex";
-import "katex/dist/katex.min.css"; // Make sure KaTeX styles are imported
+import "katex/dist/katex.min.css";
 
 const QuestionForm = () => {
   const [question, setQuestion] = useState("");
   const [course, setCourse] = useState("");
-  const [co, setCo] = useState("");
+  const [co, setCo] = useState(null);
+  const [marks, setMarks] = useState("");
   const [courses, setCourses] = useState([]);
   const [cos, setCos] = useState([]);
   const [preview, setPreview] = useState(false);
   const previewRef = useRef(null);
 
-  // Fetch courses on initial load
   useEffect(() => {
-    axios.get("http://localhost:8000/get-courses/")
+    axios
+      .get("http://localhost:8000/get-courses/")
       .then((response) => setCourses(response.data))
       .catch((error) => console.error("Error fetching courses:", error));
   }, []);
 
-  // Fetch COs when a course is selected
   useEffect(() => {
     if (course) {
-      axios.get(`http://localhost:8000/cos/by-course/${course}/`)
+      axios
+        .get(`http://localhost:8000/cos/by-course/${course}/`)
         .then((response) => setCos(response.data))
         .catch((error) => console.error("Error fetching COs:", error));
     }
   }, [course]);
 
-  const handleQuestionChange = (event) => {
-    setQuestion(event.target.value);
-  };
+  const handleQuestionChange = (event) => setQuestion(event.target.value);
 
   const handleCourseChange = (event) => {
     setCourse(event.target.value);
+    setCo(null);
   };
 
-  const handleCoChange = (event) => {
-    setCo(event.target.value);
-  };
+  const handleMarksChange = (event) => setMarks(event.target.value);
+
+  const handleCoSelect = (coId) => setCo(coId);
 
   const handleSubmit = () => {
+    if (!co) {
+      alert("Please select a CO.");
+      return;
+    }
     const data = {
-      course: course,
+      course: Number(course),
       co: co,
       question_text: question,
+      marks: Number(marks),
     };
 
-    axios.post("http://localhost:8000/add-question/", data)
-      .then((response) => {
+    axios
+      .post("http://localhost:8000/add-question/", data)
+      .then(() => {
         alert("Question added successfully!");
-        setQuestion(""); // Clear the input fields
+        setQuestion("");
         setCourse("");
-        setCo("");
+        setCo(null);
+        setMarks("");
       })
-      .catch((error) => {
-        console.error("Error adding question:", error);
-        alert("Failed to add question.");
-      });
+      .catch(() => alert("Failed to add question."));
   };
 
-  const togglePreview = () => {
-    setPreview(!preview);
-  };
+  const togglePreview = () => setPreview(!preview);
 
-  // Use KaTeX to render LaTeX when previewing
   useEffect(() => {
     if (previewRef.current && question) {
       const latexContent = question.match(/\$.*?\$/g);
-      let renderedContent = question;
-
-      // Replace newlines with <br> tags for plain text
-      renderedContent = renderedContent.replace(/\n/g, "<br>");
+      let renderedContent = question.replace(/\n/g, "<br>");
 
       if (latexContent) {
         latexContent.forEach((latex) => {
           const renderedLatex = katex.renderToString(latex.replace(/\$/g, ""));
-          renderedContent = renderedContent.replace(latex, `<span class="katex">${renderedLatex}</span>`);
+          renderedContent = renderedContent.replace(
+            latex,
+            `<span class="katex">${renderedLatex}</span>`
+          );
         });
       }
 
       previewRef.current.innerHTML = renderedContent;
     }
-  }, [question, preview]);
+  }, [question, previewRef]);
 
   return (
     <Box sx={{ display: "flex", gap: 2, padding: 2, height: "100%" }}>
@@ -92,14 +104,9 @@ const QuestionForm = () => {
           Add Question
         </Typography>
 
-        {/* Course Dropdown */}
         <FormControl fullWidth sx={{ marginBottom: 2 }}>
           <InputLabel>Course</InputLabel>
-          <Select
-            value={course}
-            onChange={handleCourseChange}
-            label="Course"
-          >
+          <Select value={course} onChange={handleCourseChange} label="Course">
             {courses.map((course) => (
               <MenuItem key={course.course_id} value={course.course_id}>
                 {course.title}
@@ -108,24 +115,64 @@ const QuestionForm = () => {
           </Select>
         </FormControl>
 
-        {/* CO Dropdown */}
-        <FormControl fullWidth sx={{ marginBottom: 2 }}>
-          <InputLabel>CO</InputLabel>
-          <Select
-            value={co}
-            onChange={handleCoChange}
-            label="CO"
-            disabled={!course}
+        {course && cos.length > 0 && (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 2,
+              marginBottom: 2,
+              justifyContent: "flex-start",
+            }}
           >
-            {cos.map((co) => (
-              <MenuItem key={co.co_id} value={co.co_id}>
-                {co.co_label} : {co.co_description}
-              </MenuItem>
+            {cos.map((coItem) => (
+              <Tooltip
+                key={coItem.co_id}
+                title={coItem.co_description}
+                placement="top"
+                arrow
+              >
+                <Box
+                  sx={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: "50%",
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: co === coItem.co_id ? "#007BFF" : "white",
+                    color: co === coItem.co_id ? "white" : "#007BFF",
+                    border: "2px solid #007BFF",
+                    transition: "all 0.3s ease",
+                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                    "&:hover": {
+                      backgroundColor: "#007BFF",
+                      color: "white",
+                      boxShadow: "0px 4px 8px rgba(0, 123, 255, 0.3)",
+                    },
+                  }}
+                  onClick={() => handleCoSelect(coItem.co_id)}
+                >
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+                    {coItem.co_label}
+                  </Typography>
+                </Box>
+              </Tooltip>
             ))}
-          </Select>
-        </FormControl>
+          </Box>
+        )}
 
-        {/* Question Text Field */}
+        <TextField
+          label="Marks"
+          type="number"
+          fullWidth
+          value={marks}
+          onChange={handleMarksChange}
+          variant="outlined"
+          sx={{ marginBottom: 2 }}
+        />
+
         <TextField
           label="Enter Question"
           multiline
@@ -137,7 +184,6 @@ const QuestionForm = () => {
           sx={{ marginBottom: 2 }}
         />
 
-        {/* Buttons */}
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Button variant="contained" onClick={handleSubmit}>
             Add Question
@@ -148,7 +194,6 @@ const QuestionForm = () => {
         </Box>
       </Box>
 
-      {/* Right Side - Preview */}
       {preview && (
         <Box
           sx={{
@@ -158,12 +203,11 @@ const QuestionForm = () => {
             borderRadius: "8px",
             minHeight: "200px",
             display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            fontFamily: "'KaTeX Main', sans-serif", // Apply KaTeX font to normal text
+            flexDirection: "column",
+            alignItems: "flex-start",
           }}
         >
-          <Typography variant="h6" sx={{justifySelf:"left", alignSelf:"flex-start"}}>Preview:</Typography>
+          <Typography variant="h6">Preview:</Typography>
           <div ref={previewRef}></div>
         </Box>
       )}
@@ -172,9 +216,3 @@ const QuestionForm = () => {
 };
 
 export default QuestionForm;
-
-
-// Evaluate the following definite integral: 
-// $I = \int_0^1 \left( 3x^2 - 2x + 1 \right) \, dx$
-
-// This integral represents the area under the curve $ 3x^2 - 2x + 1 $ between the points $ x = 0 $ and $ x = 1 $.
