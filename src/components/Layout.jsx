@@ -48,8 +48,13 @@ const ExactLayout = () => {
       }
       return ["sub1"]; // Expand only Manage
     }
+    
+    if (currentPath.startsWith("/add-question")) {
+      return ["sub4"]; // Open the Question Pool submenu
+    }
+  
     return [];
-  };
+  };  
 
   useEffect(() => {
     const storedFullName = localStorage.getItem("full_name");
@@ -210,6 +215,20 @@ const ExactLayout = () => {
                 icon={<FormOutlined style={{ fontSize: "20px" }} />}
               >
                 <Link to="/manage-internal-exam">Internal Exams</Link>
+              </Menu.Item>
+            </Menu.SubMenu>
+          )}
+            {userRole === "teacher" && (
+            <Menu.SubMenu
+              key="sub4"
+              icon={<FileTextOutlined style={{ fontSize: "20px" }} />}
+              title="Question Pool"
+            >
+              <Menu.Item
+                key="/add-question"
+                icon={<FormOutlined style={{ fontSize: "20px" }} />}
+              >
+                <Link to="/add-question">Manage Question</Link>
               </Menu.Item>
             </Menu.SubMenu>
           )}
