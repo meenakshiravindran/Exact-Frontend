@@ -225,10 +225,10 @@ const ExactLayout = () => {
               title="Question Pool"
             >
               <Menu.Item
-                key="/add-question"
+                key="/manage-question"
                 icon={<FormOutlined style={{ fontSize: "20px" }} />}
               >
-                <Link to="/add-question">Manage Question</Link>
+                <Link to="/manage-question">Manage Question</Link>
               </Menu.Item>
             </Menu.SubMenu>
           )}

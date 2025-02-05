@@ -77,12 +77,11 @@ const QuestionForm = () => {
   };
 
   const togglePreview = () => setPreview(!preview);
-
   useEffect(() => {
-    if (previewRef.current && question) {
+    if (preview && previewRef.current && question) {
       const latexContent = question.match(/\$.*?\$/g);
       let renderedContent = question.replace(/\n/g, "<br>");
-
+  
       if (latexContent) {
         latexContent.forEach((latex) => {
           const renderedLatex = katex.renderToString(latex.replace(/\$/g, ""));
@@ -92,11 +91,11 @@ const QuestionForm = () => {
           );
         });
       }
-
+  
       previewRef.current.innerHTML = renderedContent;
     }
-  }, [question, previewRef]);
-
+  }, [question, preview, previewRef]); 
+  
   return (
     <Box sx={{ display: "flex", gap: 2, padding: 2, height: "100%" }}>
       <Box sx={{ flex: 1 }}>
