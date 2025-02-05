@@ -34,6 +34,7 @@ import { InternalExamList } from "./components/Questions/manageInternalExam";
 import CreateInternalExam from "./components/Questions/addInternalExam";
 import EditQuestion from "./components/Questions/editQuestion";
 import ManageQuestion from "./components/Questions/manageQuestion";
+import ExamSectionPage from "./components/Exam/ExamSection";
 
 
 function App() {
@@ -84,6 +85,8 @@ function App() {
           <Route path="/manage-question" element={<ProtectedRoute element={<ManageQuestion />} allowedRoles={['teacher']} />} />
  
  
+          <Route path="/exam-section/:int_exam_id" element={<ProtectedRoute element={<ExamSectionPage/>} allowedRoles={['teacher']} />}/>
+          
         </Route>
       </Routes>
     </BrowserRouter>
