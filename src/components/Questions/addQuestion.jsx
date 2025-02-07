@@ -52,29 +52,33 @@ const QuestionForm = () => {
 
   const handleCoSelect = (coId) => setCo(coId);
 
-  const handleSubmit = () => {
-    if (!co) {
-      alert("Please select a CO.");
-      return;
-    }
-    const data = {
-      course: Number(course),
-      co: co,
-      question_text: question,
-      marks: Number(marks),
-    };
+const handleSubmit = () => {
+  if (!co) {
+    alert("Please select a CO.");
+    return;
+  }
 
-    axios
-      .post("http://localhost:8000/add-question/", data)
-      .then(() => {
-        alert("Question added successfully!");
-        setQuestion("");
-        setCourse("");
-        setCo(null);
-        setMarks("");
-      })
-      .catch(() => alert("Failed to add question."));
+  // Replace new lines with LaTeX's line break (\\)
+  const formattedQuestion = question.replace(/\n/g, " \\\\ ");
+
+  const data = {
+    course: Number(course),
+    co: co,
+    question_text: formattedQuestion, // Store with LaTeX line breaks
+    marks: Number(marks),
   };
+
+  axios
+    .post("http://localhost:8000/add-question/", data)
+    .then(() => {
+      alert("Question added successfully!");
+      setQuestion("");
+      setCourse("");
+      setCo(null);
+      setMarks("");
+    })
+    .catch(() => alert("Failed to add question."));
+};
 
   const togglePreview = () => setPreview(!preview);
   useEffect(() => {

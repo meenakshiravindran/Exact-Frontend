@@ -26,25 +26,34 @@ const AddSectionDialog = ({ open, onClose, onAdd }) => {
     }
 
     const newSection = {
-      internal_exam: parseInt(int_exam_id), // Use the ID from the route params
       section_name: sectionName,
       no_of_questions: parseInt(numQuestions),
       no_of_questions_to_be_answered: parseInt(numToAnswer),
       ceiling_mark: parseInt(ceilingMark),
       description: description || "",
     };
-
+  
     try {
-      const response = await axios.post("http://localhost:8000/add-section/", newSection, {
+      const response = await axios.post( `http://localhost:8000/add-exam-sections/${int_exam_id}/`, newSection, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      onAdd(response.data);
+  
+      onAdd({
+        id: response.data.id, // Ensure the ID is included
+        section_name: response.data.section_name,
+        description: response.data.description,
+        no_of_questions: response.data.no_of_questions,
+        no_of_questions_to_be_answered: response.data.no_of_questions_to_be_answered,
+        ceiling_mark: response.data.ceiling_mark,
+      });
+  
       handleClose();
     } catch (error) {
       console.error("Error adding section:", error.response?.data || error);
       alert("Failed to add section. Please try again.");
     }
   };
+  
 
   const handleClose = () => {
     setSectionName("");
