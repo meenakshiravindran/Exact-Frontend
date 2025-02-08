@@ -10,13 +10,20 @@ import {
   ListItemText,
   CircularProgress,
 } from "@mui/material";
-import { Add, Edit, Delete, ArrowUpward } from "@mui/icons-material";
+import {
+  Add,
+  Edit,
+  Delete,
+  ArrowUpward,
+  Visibility,
+} from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 import AddSectionDialog from "./AddSection";
 import axios from "axios";
 import SelectQuestion from "../Questions/selectQuestion";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import ExamPreview from "./ExamPreview";
 
 const ExamSectionPage = () => {
   const { int_exam_id } = useParams();
@@ -26,7 +33,10 @@ const ExamSectionPage = () => {
   const [openQuestionDialog, setOpenQuestionDialog] = useState(false);
   const [selectedSection, setSelectedSection] = useState(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const [latexPreview, setLatexPreview] = useState("");
+  const [renderedLatex, setRenderedLatex] = useState("");
+  const [previewData, setPreviewData] = useState(null);
 
   // Fetch exam details on component mount
   useEffect(() => {
@@ -60,7 +70,6 @@ const ExamSectionPage = () => {
         })
       );
       setSections(sectionsWithQuestions);
-      console.log("Sections with questions,", sectionsWithQuestions);
     } catch (err) {
       console.error("Error fetching sections or questions:", err);
       setError("Failed to load exam sections.");
@@ -72,6 +81,7 @@ const ExamSectionPage = () => {
     fetchExamSections();
   }, [int_exam_id]);
 
+  // Delete a section
   const deleteSection = async (id) => {
     try {
       await axios.delete(`http://localhost:8000/exam-sections/delete/${id}/`);
@@ -81,11 +91,13 @@ const ExamSectionPage = () => {
     }
   };
 
+  // Open question selection dialog
   const handleOpenSelectQuestion = (section) => {
     setSelectedSection(section);
     setOpenQuestionDialog(true);
   };
 
+  // Handle question selection
   const handleSelectQuestions = async (sectionId, selectedQuestions) => {
     setSections((prevSections) =>
       prevSections.map((section) =>
@@ -94,11 +106,10 @@ const ExamSectionPage = () => {
     );
   };
 
-  // Handle add section with refetching
+  // Handle adding a new section
   const handleAddSection = (newSection) => {
-    setLoading(true); // Set loading to true when adding the section
+    setLoading(true);
 
-    // Optimistic UI update: immediately add the new section
     const updatedSections = [
       ...sections,
       { ...newSection, selectedQuestions: [] },
@@ -107,14 +118,13 @@ const ExamSectionPage = () => {
     setSections(updatedSections);
     setOpenDialog(false);
 
-    // Simulate delay for loading effect
     setTimeout(() => {
-      setLoading(false); // Hide the loading indicator after the delay
-      // Refetch the sections from the backend
-      fetchExamSections(); // This will refetch the updated sections from the server
-    }, 1000); // 1 second delay to simulate server-side processing
+      setLoading(false);
+      fetchExamSections();
+    }, 1000);
   };
 
+  // Render question text with LaTeX support
   const renderQuestionText = (text) => {
     const latexMatches = text.match(/\$.*?\$/g);
     let renderedText = text.replace(/\\/g, "<br>");
@@ -132,6 +142,35 @@ const ExamSectionPage = () => {
     return <span dangerouslySetInnerHTML={{ __html: renderedText }} />;
   };
 
+  const generateLatex = async () => {
+    try {
+      const previewData = {
+        exam_name: examDetails.exam_name,
+        course_name: examDetails.course_name,
+        date: examDetails.date,
+        faculty_name: examDetails.faculty_name,
+        max_marks: examDetails.max_marks,
+        duration: examDetails.duration,
+        sections: sections.map((section) => ({
+          name: section.name,
+          description: section.description,
+          questions: section.selectedQuestions.map((q) => ({
+            text: q.question_text,
+            marks: q.marks,
+            co: q.co
+          })),
+        })),
+      };
+
+      const response = await axios.post(
+        "http://localhost:8000/exam-preview/",
+        previewData
+      );
+      setPreviewData(response.data.image);
+    } catch (error) {
+      console.error("Error generating preview:", error);
+    }
+  };
   if (error) {
     return <Typography color="error">{error}</Typography>;
   }
@@ -147,10 +186,31 @@ const ExamSectionPage = () => {
           >
             {examDetails.exam_name} - {examDetails.course_name}
           </Typography>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            marginBottom="20px"
+          >
+            <Box>
+              <Typography variant="body1">Date: {examDetails.date}</Typography>
+              <Typography variant="body1">
+                Faculty: {examDetails.faculty_name}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="body1">
+                Max Marks: {examDetails.max_marks}
+              </Typography>
+              <Typography variant="body1">
+                Duration: {examDetails.duration} mins
+              </Typography>
+            </Box>
+          </Box>
 
           {loading ? (
             <Box display="flex" justifyContent="center" alignItems="center">
-              <CircularProgress /> {/* Show loading spinner while adding section */}
+              <CircularProgress />
             </Box>
           ) : (
             sections.map((section) => (
@@ -165,18 +225,26 @@ const ExamSectionPage = () => {
 
                 {section.selectedQuestions &&
                   section.selectedQuestions.length > 0 && (
-                    <List>
+                    <List >
                       {section.selectedQuestions.map((q, index) => (
-                        <ListItem key={index}>
-                          <ListItemText
-                            primary={
-                              <div>
-                                {index + 1}.<span> {renderQuestionText(q.question_text)}</span>
-                              </div>
-                            }
-                            secondary={`Marks: ${q.marks}`}
-                          />
-                        </ListItem>
+                        <ListItemText
+                          primary={
+                            <div>
+                              {index + 1}.{" "}
+                              <span>{renderQuestionText(q.question_text)}</span>
+                            </div>
+                          }
+                          secondary={
+                            <div >
+                              <Typography variant="body2">
+                                Marks: {q.marks}
+                              </Typography>
+                              <Typography variant="body2" color="textSecondary">
+                                 [{q.co}]
+                              </Typography>
+                            </div>
+                          }
+                        />
                       ))}
                     </List>
                   )}
@@ -214,14 +282,21 @@ const ExamSectionPage = () => {
             ))
           )}
 
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Add />}
-            onClick={() => setOpenDialog(true)}
-          >
-            Add Section
-          </Button>
+          <Box display="flex" alignItems="center" gap={2} marginTop={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<Add />}
+              onClick={() => setOpenDialog(true)}
+            >
+              Add Section
+            </Button>
+            <IconButton onClick={generateLatex}>
+              <Visibility color="action" />
+            </IconButton>
+          </Box>
+
+          {previewData && <ExamPreview previewData={previewData} />}
 
           <AddSectionDialog
             open={openDialog}
