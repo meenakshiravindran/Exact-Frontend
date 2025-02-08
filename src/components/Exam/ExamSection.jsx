@@ -157,7 +157,7 @@ const ExamSectionPage = () => {
           questions: section.selectedQuestions.map((q) => ({
             text: q.question_text,
             marks: q.marks,
-            co: q.co
+            co: q.co,
           })),
         })),
       };
@@ -225,7 +225,7 @@ const ExamSectionPage = () => {
 
                 {section.selectedQuestions &&
                   section.selectedQuestions.length > 0 && (
-                    <List >
+                    <List>
                       {section.selectedQuestions.map((q, index) => (
                         <ListItemText
                           primary={
@@ -235,12 +235,12 @@ const ExamSectionPage = () => {
                             </div>
                           }
                           secondary={
-                            <div >
+                            <div>
                               <Typography variant="body2">
                                 Marks: {q.marks}
                               </Typography>
                               <Typography variant="body2" color="textSecondary">
-                                 [{q.co}]
+                                [{q.co}]
                               </Typography>
                             </div>
                           }
@@ -268,15 +268,17 @@ const ExamSectionPage = () => {
                     </IconButton>
                   </div>
 
-                  <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<Add />}
-                    color="secondary"
-                    onClick={() => handleOpenSelectQuestion(section)}
-                  >
-                    Add Question
-                  </Button>
+                  {section.selectedQuestions.length < section.numQuestions && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<Add />}
+                      color="secondary"
+                      onClick={() => handleOpenSelectQuestion(section)}
+                    >
+                      Add Question
+                    </Button>
+                  )}
                 </div>
               </Card>
             ))

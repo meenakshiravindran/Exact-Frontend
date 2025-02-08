@@ -58,12 +58,21 @@ const SelectQuestion = ({ open, onClose, section, onSelectQuestions, existingSel
     }, [section, open]);
 
     const handleToggle = (question) => {
-      setSelectedQuestions((prev) =>
-        prev.some((q) => q.question_id === question.question_id)
-          ? prev.filter((q) => q.question_id !== question.question_id)  // Remove if already selected
-          : [...prev, question]  // Add if not selected
-      );
-    };
+        setSelectedQuestions((prev) => {
+          if (prev.some((q) => q.question_id === question.question_id)) {
+            // Remove if already selected
+            return prev.filter((q) => q.question_id !== question.question_id);
+          } else {
+            // Prevent selection if the limit is reached
+            if (prev.length >= section.numQuestions) {
+              alert(`You can only select up to ${section.numQuestions} questions.`);
+              return prev;
+            }
+            return [...prev, question]; // Add if not selected
+          }
+        });
+      };
+      
   
     const handleSubmit = async () => {
       try {
