@@ -6,9 +6,9 @@ import {
   IconButton,
   Box,
   List,
-  ListItem,
   ListItemText,
   CircularProgress,
+  Drawer,
 } from "@mui/material";
 import {
   Add,
@@ -25,6 +25,7 @@ import katex from "katex";
 import "katex/dist/katex.min.css";
 import ExamPreview from "./ExamPreview";
 
+
 const ExamSectionPage = () => {
   const { int_exam_id } = useParams();
   const [examDetails, setExamDetails] = useState(null);
@@ -34,9 +35,8 @@ const ExamSectionPage = () => {
   const [selectedSection, setSelectedSection] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [latexPreview, setLatexPreview] = useState("");
-  const [renderedLatex, setRenderedLatex] = useState("");
   const [previewData, setPreviewData] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false); // State for drawer
 
   // Fetch exam details on component mount
   useEffect(() => {
@@ -142,6 +142,7 @@ const ExamSectionPage = () => {
     return <span dangerouslySetInnerHTML={{ __html: renderedText }} />;
   };
 
+  // Generate LaTeX preview
   const generateLatex = async () => {
     try {
       const previewData = {
@@ -167,10 +168,12 @@ const ExamSectionPage = () => {
         previewData
       );
       setPreviewData(response.data.image);
+      setIsPreviewOpen(true); // Open the drawer
     } catch (error) {
       console.error("Error generating preview:", error);
     }
   };
+
   if (error) {
     return <Typography color="error">{error}</Typography>;
   }
@@ -179,13 +182,20 @@ const ExamSectionPage = () => {
     <div style={{ padding: "20px" }}>
       {examDetails ? (
         <>
-          <Typography
-            variant="h5"
-            align="center"
-            style={{ marginBottom: "20px" }}
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            marginBottom="20px"
           >
-            {examDetails.exam_name} - {examDetails.course_name}
-          </Typography>
+            <Typography variant="h5" align="center">
+              {examDetails.exam_name} - {examDetails.course_name}
+            </Typography>
+            <IconButton onClick={generateLatex}>
+              <Visibility color="action" />
+            </IconButton>
+          </Box>
+
           <Box
             display="flex"
             justifyContent="space-between"
@@ -228,6 +238,7 @@ const ExamSectionPage = () => {
                     <List>
                       {section.selectedQuestions.map((q, index) => (
                         <ListItemText
+                          key={q.id}
                           primary={
                             <div>
                               {index + 1}.{" "}
@@ -252,7 +263,7 @@ const ExamSectionPage = () => {
                 <div
                   style={{
                     display: "flex",
-                    justifyContent: "space-between",
+                    justifyContent:"space-between",
                     alignItems: "center",
                   }}
                 >
@@ -262,9 +273,6 @@ const ExamSectionPage = () => {
                     </IconButton>
                     <IconButton onClick={() => deleteSection(section.id)}>
                       <Delete color="error" />
-                    </IconButton>
-                    <IconButton>
-                      <ArrowUpward />
                     </IconButton>
                   </div>
 
@@ -293,12 +301,18 @@ const ExamSectionPage = () => {
             >
               Add Section
             </Button>
-            <IconButton onClick={generateLatex}>
-              <Visibility color="action" />
-            </IconButton>
           </Box>
 
-          {previewData && <ExamPreview previewData={previewData} />}
+          {/* Drawer for Preview */}
+          <Drawer
+            anchor="right"
+            open={isPreviewOpen}
+            onClose={() => setIsPreviewOpen(false)}
+          >
+            <Box sx={{ width: "50vw", padding: "20px" }}>
+              {previewData && <ExamPreview previewData={previewData} />}
+            </Box>
+          </Drawer>
 
           <AddSectionDialog
             open={openDialog}
