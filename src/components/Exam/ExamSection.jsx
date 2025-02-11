@@ -9,6 +9,11 @@ import {
   ListItemText,
   CircularProgress,
   Drawer,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  DialogActions,
 } from "@mui/material";
 import {
   Add,
@@ -37,6 +42,14 @@ const ExamSectionPage = () => {
   const [loading, setLoading] = useState(false);
   const [previewData, setPreviewData] = useState(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false); // State for drawer
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [editSection, setEditSection] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editNoOfQuestions, setEditNoOfQuestions] = useState(0);
+  const [editNoOfQuestionsToBeAnswered, setEditNoOfQuestionsToBeAnswered] =
+    useState(0);
+  const [editCeilingMark, setEditCeilingMark] = useState(0);
 
   // Fetch exam details on component mount
   useEffect(() => {
@@ -96,7 +109,40 @@ const ExamSectionPage = () => {
     setSelectedSection(section);
     setOpenQuestionDialog(true);
   };
-
+  const handleOpenEditDialog = (section) => {
+    setEditSection(section);
+    setEditName(section.name);
+    setEditDescription(section.description);
+    setEditNoOfQuestions(section.numQuestions);
+    setEditNoOfQuestionsToBeAnswered(section.numToAnswer);
+    setEditCeilingMark(section.ceilingMark);
+    setOpenEditDialog(true);
+  };
+  
+  const handleUpdateSection = async () => {
+    if (!editSection) return;
+  
+    try {
+      const updatedSection = {
+        section_name: editName,
+        description: editDescription,
+        no_of_questions: editNoOfQuestions,
+        no_of_questions_to_be_answered: editNoOfQuestionsToBeAnswered,
+        ceiling_mark: editCeilingMark,
+      };
+  
+      await axios.put(
+        `http://localhost:8000/exam-sections/update/${editSection.id}/`,
+        updatedSection
+      );
+  
+      setOpenEditDialog(false);
+      fetchExamSections(); // Refresh sections after update
+    } catch (error) {
+      console.error("Error updating section:", error);
+    }
+  };
+  
   // Handle question selection
   const handleSelectQuestions = async (sectionId, selectedQuestions) => {
     setSections((prevSections) =>
@@ -268,7 +314,7 @@ const ExamSectionPage = () => {
                   }}
                 >
                   <div>
-                    <IconButton>
+                    <IconButton onClick={() => handleOpenEditDialog(section)}>
                       <Edit color="primary" />
                     </IconButton>
                     <IconButton onClick={() => deleteSection(section.id)}>
@@ -328,7 +374,57 @@ const ExamSectionPage = () => {
               onSelectQuestions={handleSelectQuestions}
             />
           )}
+          <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+            <DialogTitle>Edit Section</DialogTitle>
+            <DialogContent>
+              <TextField
+                label="Section Name"
+                fullWidth
+                margin="normal"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
+              <TextField
+                label="Description"
+                fullWidth
+                margin="normal"
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+              />
+              <TextField
+                label="Number of Questions"
+                fullWidth
+                margin="normal"
+                type="number"
+                value={editNoOfQuestions}
+                onChange={(e) => setEditNoOfQuestions(e.target.value)}
+              />
+              <TextField
+                label="Questions to be Answered"
+                fullWidth
+                margin="normal"
+                type="number"
+                value={editNoOfQuestionsToBeAnswered}
+                onChange={(e) => setEditNoOfQuestionsToBeAnswered(e.target.value)}
+              />
+              <TextField
+                label="Ceiling Mark"
+                fullWidth
+                margin="normal"
+                type="number"
+                value={editCeilingMark}
+                onChange={(e) => setEditCeilingMark(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+              <Button onClick={handleUpdateSection} color="primary">
+                Save
+              </Button>
+            </DialogActions>
+        </Dialog>
         </>
+
       ) : (
         <Typography align="center">Loading exam details...</Typography>
       )}

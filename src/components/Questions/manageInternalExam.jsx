@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import axios from "axios"
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   Box,
   Typography,
@@ -14,28 +14,27 @@ import {
   Select,
   MenuItem,
   Container,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material"
+} from "@mui/material";
 import {
   Add as AddIcon,
   School as SchoolIcon,
   AccessTime as AccessTimeIcon,
   Grade as GradeIcon,
-} from "@mui/icons-material"
-import CreateInternalExam from "./addInternalExam"
+  Visibility as VisibilityIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
+import CreateInternalExam from "./addInternalExam";
 
 export const InternalExamList = () => {
-  const [exams, setExams] = useState([])
-  const [batches, setBatches] = useState([])
-  const [combinedData, setCombinedData] = useState([])
-  const [selectedBatch, setSelectedBatch] = useState("")
-  const [openDialog, setOpenDialog] = useState(false)
-  const [openCreateExamDialog, setOpenCreateExamDialog] = useState(false)
-  const [batchForCreateExam, setBatchForCreateExam] = useState(null)
-  const accessToken = localStorage.getItem("access_token")
-
-  const theme = useTheme()
+  const [exams, setExams] = useState([]);
+  const [batches, setBatches] = useState([]);
+  const [combinedData, setCombinedData] = useState([]);
+  const [selectedBatch, setSelectedBatch] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openCreateExamDialog, setOpenCreateExamDialog] = useState(false);
+  const [batchForCreateExam, setBatchForCreateExam] = useState(null);
+  const navigate = useNavigate();
+  const accessToken = localStorage.getItem("access_token");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,47 +46,56 @@ export const InternalExamList = () => {
           axios.get("http://localhost:8000/faculty-batches/", {
             headers: { Authorization: `Bearer ${accessToken}` },
           }),
-        ])
+        ]);
 
-        setExams(examRes.data)
-        setBatches(batchRes.data)
+        setExams(examRes.data);
+        setBatches(batchRes.data);
 
-        // Combine exams with batch data (assuming each exam has a batch_id field)
         const combined = examRes.data.map((exam, index) => ({
           ...exam,
-          batch: batchRes.data[index % batchRes.data.length], // Distribute exams among batches
-        }))
+          batch: batchRes.data[index % batchRes.data.length],
+        }));
 
-        setCombinedData(combined)
+        setCombinedData(combined);
       } catch (error) {
-        console.error("Error fetching data:", error)
+        console.error("Error fetching data:", error);
       }
-    }
+    };
 
-    fetchData()
-  }, [accessToken])
+    fetchData();
+  }, [accessToken]);
 
-  // Open batch selection dialog
   const handleOpenDialog = () => {
-    setOpenDialog(true)
-  }
+    setOpenDialog(true);
+  };
 
-  // Handle selecting a batch and opening the create exam dialog
   const handleProceed = () => {
     if (selectedBatch) {
-      setBatchForCreateExam(selectedBatch)
-      setOpenDialog(false)
-      setOpenCreateExamDialog(true)
+      setBatchForCreateExam(selectedBatch);
+      setOpenDialog(false);
+      setOpenCreateExamDialog(true);
     }
-  }
+  };
+
+  const handleViewExam = (examId) => {
+    navigate(`/exam-section/${examId}`);
+  };
+
+  const handleDeleteExam = async (examId) => {
+    try {
+      await axios.delete(`http://localhost:8000/delete-internal-exam/${examId}/`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      setCombinedData(combinedData.filter((exam) => exam.int_exam_id !== examId));
+    } catch (error) {
+      console.error("Error deleting exam:", error);
+    }
+  };
 
   return (
     <Container maxWidth="100vw" sx={{ py: 4 }}>
-      {/* Header Section */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1">
-          My Internal Exams
-        </Typography>
+        <Typography variant="h4">My Internal Exams</Typography>
         <Button
           variant="contained"
           color="primary"
@@ -99,7 +107,6 @@ export const InternalExamList = () => {
         </Button>
       </Box>
 
-      {/* Box for Exam Cards */}
       <Box display="flex" flexWrap="wrap" gap={3}>
         {combinedData.map((exam) => (
           <Card
@@ -107,7 +114,6 @@ export const InternalExamList = () => {
             sx={{
               width: "100%",
               maxWidth: 345,
-              height: "auto",
               display: "flex",
               flexDirection: "column",
               transition: "0.3s",
@@ -115,32 +121,45 @@ export const InternalExamList = () => {
             }}
           >
             <CardContent sx={{ flexGrow: 1 }}>
-              <Typography variant="h6" component="h2" gutterBottom>
-                {exam.exam_name}
-              </Typography>
+              <Typography variant="h6" gutterBottom>{exam.exam_name}</Typography>
               <Typography variant="subtitle1" color="text.secondary" gutterBottom>
                 {exam.batch.course__title}
               </Typography>
               <Box display="flex" alignItems="center" mb={1}>
                 <SchoolIcon fontSize="small" sx={{ mr: 1, color: "primary.main" }} />
-                <Typography variant="body2">
-                  Year: {exam.batch.year}, Part: {exam.batch.part}
-                </Typography>
+                <Typography variant="body2">Year: {exam.batch.year}, Part: {exam.batch.part}</Typography>
               </Box>
               <Box display="flex" alignItems="center" mb={1}>
                 <AccessTimeIcon fontSize="small" sx={{ mr: 1, color: "secondary.main" }} />
                 <Typography variant="body2">Duration: {exam.duration} mins</Typography>
               </Box>
-              <Box display="flex" alignItems="center">
+              <Box display="flex" alignItems="center" mb={2}>
                 <GradeIcon fontSize="small" sx={{ mr: 1, color: "success.main" }} />
                 <Typography variant="body2">Max Marks: {exam.max_marks}</Typography>
               </Box>
+              <Box display="flex" justifyContent="flex-start" gap={0.5}>
+                <Button
+                  variant="text"
+                  color="secondary"
+                  onClick={() => handleViewExam(exam.int_exam_id)}
+                  sx={{ minWidth: "40px", padding: "8px" }}
+                >
+                  <VisibilityIcon />
+                </Button>
+                <Button
+                  variant='text'
+                  color="error"
+                  onClick={() => handleDeleteExam(exam.int_exam_id)}
+                  sx={{ minWidth: "40px", padding: "4px" }}
+                >
+                  <DeleteIcon />
+                </Button>
+            </Box>
             </CardContent>
           </Card>
         ))}
       </Box>
 
-      {/* Batch Selection Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Select a Batch</DialogTitle>
         <DialogContent>
@@ -162,12 +181,11 @@ export const InternalExamList = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Create Internal Exam Dialog */}
       <CreateInternalExam
         open={openCreateExamDialog}
         onClose={() => setOpenCreateExamDialog(false)}
         batchId={batchForCreateExam}
       />
     </Container>
-  )
-}
+  );
+};
