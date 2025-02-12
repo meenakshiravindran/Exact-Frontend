@@ -30,7 +30,6 @@ import katex from "katex";
 import "katex/dist/katex.min.css";
 import ExamPreview from "./ExamPreview";
 
-
 const ExamSectionPage = () => {
   const { int_exam_id } = useParams();
   const [examDetails, setExamDetails] = useState(null);
@@ -118,10 +117,10 @@ const ExamSectionPage = () => {
     setEditCeilingMark(section.ceilingMark);
     setOpenEditDialog(true);
   };
-  
+
   const handleUpdateSection = async () => {
     if (!editSection) return;
-  
+
     try {
       const updatedSection = {
         section_name: editName,
@@ -130,19 +129,19 @@ const ExamSectionPage = () => {
         no_of_questions_to_be_answered: editNoOfQuestionsToBeAnswered,
         ceiling_mark: editCeilingMark,
       };
-  
+
       await axios.put(
         `http://localhost:8000/exam-sections/update/${editSection.id}/`,
         updatedSection
       );
-  
+
       setOpenEditDialog(false);
       fetchExamSections(); // Refresh sections after update
     } catch (error) {
       console.error("Error updating section:", error);
     }
   };
-  
+
   // Handle question selection
   const handleSelectQuestions = async (sectionId, selectedQuestions) => {
     await fetchExamSections();
@@ -184,7 +183,6 @@ const ExamSectionPage = () => {
     return <span dangerouslySetInnerHTML={{ __html: renderedText }} />;
   };
 
-  
   // Generate LaTeX preview
   const generateLatex = async () => {
     try {
@@ -306,7 +304,7 @@ const ExamSectionPage = () => {
                 <div
                   style={{
                     display: "flex",
-                    justifyContent:"space-between",
+                    justifyContent: "space-between",
                     alignItems: "center",
                   }}
                 >
@@ -319,17 +317,17 @@ const ExamSectionPage = () => {
                     </IconButton>
                   </div>
 
-                  {section.selectedQuestions.length < section.numQuestions && (
-                    <Button
-                      variant="contained"
-                      size="small"
-                      startIcon={<Add />}
-                      color="secondary"
-                      onClick={() => handleOpenSelectQuestion(section)}
-                    >
-                      Add Question
-                    </Button>
-                  )}
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<Add />}
+                    color="secondary"
+                    onClick={() => handleOpenSelectQuestion(section)}
+                  >
+                    {section.selectedQuestions.length > 0
+                      ? "Edit Questions"
+                      : "Add Questions"}
+                  </Button>
                 </div>
               </Card>
             ))
@@ -371,7 +369,10 @@ const ExamSectionPage = () => {
               onSelectQuestions={handleSelectQuestions}
             />
           )}
-          <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+          <Dialog
+            open={openEditDialog}
+            onClose={() => setOpenEditDialog(false)}
+          >
             <DialogTitle>Edit Section</DialogTitle>
             <DialogContent>
               <TextField
@@ -402,7 +403,9 @@ const ExamSectionPage = () => {
                 margin="normal"
                 type="number"
                 value={editNoOfQuestionsToBeAnswered}
-                onChange={(e) => setEditNoOfQuestionsToBeAnswered(e.target.value)}
+                onChange={(e) =>
+                  setEditNoOfQuestionsToBeAnswered(e.target.value)
+                }
               />
               <TextField
                 label="Ceiling Mark"
@@ -419,9 +422,8 @@ const ExamSectionPage = () => {
                 Save
               </Button>
             </DialogActions>
-        </Dialog>
+          </Dialog>
         </>
-
       ) : (
         <Typography align="center">Loading exam details...</Typography>
       )}

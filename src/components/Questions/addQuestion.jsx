@@ -10,7 +10,9 @@ import {
   FormControl,
   Tooltip,
   Zoom,
+  IconButton,
 } from "@mui/material";
+import { Visibility as VisibilityIcon } from "@mui/icons-material";
 import axios from "axios";
 import katex from "katex";
 import "katex/dist/katex.min.css";
@@ -42,50 +44,47 @@ const QuestionForm = () => {
   }, [course]);
 
   const handleQuestionChange = (event) => setQuestion(event.target.value);
-
   const handleCourseChange = (event) => {
     setCourse(event.target.value);
     setCo(null);
   };
-
   const handleMarksChange = (event) => setMarks(event.target.value);
-
   const handleCoSelect = (coId) => setCo(coId);
 
-const handleSubmit = () => {
-  if (!co) {
-    alert("Please select a CO.");
-    return;
-  }
+  const handleSubmit = () => {
+    if (!co) {
+      alert("Please select a CO.");
+      return;
+    }
 
-  // Replace new lines with LaTeX's line break (\\)
-  const formattedQuestion = question.replace(/\n/g, " \\\\ ");
+    const formattedQuestion = question.replace(/\n/g, " \\\\ ");
 
-  const data = {
-    course: Number(course),
-    co: co,
-    question_text: formattedQuestion, // Store with LaTeX line breaks
-    marks: Number(marks),
+    const data = {
+      course: Number(course),
+      co: co,
+      question_text: formattedQuestion,
+      marks: Number(marks),
+    };
+
+    axios
+      .post("http://localhost:8000/add-question/", data)
+      .then(() => {
+        alert("Question added successfully!");
+        setQuestion("");
+        setCourse("");
+        setCo(null);
+        setMarks("");
+      })
+      .catch(() => alert("Failed to add question."));
   };
 
-  axios
-    .post("http://localhost:8000/add-question/", data)
-    .then(() => {
-      alert("Question added successfully!");
-      setQuestion("");
-      setCourse("");
-      setCo(null);
-      setMarks("");
-    })
-    .catch(() => alert("Failed to add question."));
-};
-
   const togglePreview = () => setPreview(!preview);
+
   useEffect(() => {
     if (preview && previewRef.current && question) {
       const latexContent = question.match(/\$.*?\$/g);
       let renderedContent = question.replace(/\n/g, "<br>");
-  
+
       if (latexContent) {
         latexContent.forEach((latex) => {
           const renderedLatex = katex.renderToString(latex.replace(/\$/g, ""));
@@ -95,17 +94,33 @@ const handleSubmit = () => {
           );
         });
       }
-  
+
       previewRef.current.innerHTML = renderedContent;
     }
-  }, [question, preview, previewRef]); 
-  
+  }, [question, preview, previewRef]);
+
   return (
     <Box sx={{ display: "flex", gap: 2, padding: 2, height: "100%" }}>
       <Box sx={{ flex: 1 }}>
-        <Typography variant="h5" gutterBottom>
-          Add Question
-        </Typography>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={3}
+        >
+          <Typography variant="h5" gutterBottom>
+            Add Question
+          </Typography>
+          {/* Preview Icon */}
+          <Tooltip title={preview ? "Hide Preview" : "Show Preview"} arrow>
+            <IconButton
+              onClick={togglePreview}
+              color={preview ? "primary" : "default"}
+            >
+              <VisibilityIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
 
         <FormControl fullWidth sx={{ marginBottom: 2 }}>
           <InputLabel>Course</InputLabel>
@@ -157,7 +172,10 @@ const handleSubmit = () => {
                   }}
                   onClick={() => handleCoSelect(coItem.co_id)}
                 >
-                  <Typography variant="subtitle1" sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: "bold", fontSize: "0.9rem" }}
+                  >
                     {coItem.co_label}
                   </Typography>
                 </Box>
@@ -187,16 +205,26 @@ const handleSubmit = () => {
           sx={{ marginBottom: 2 }}
         />
 
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Button variant="contained" onClick={handleSubmit}>
+        {/* Buttons aligned to the right */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+          }}
+        >
+          {/* Add Question Button */}
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            sx={{ marginRight: 2 }}
+          >
             Add Question
-          </Button>
-          <Button variant="contained" onClick={togglePreview}>
-            {preview ? "Edit" : "Preview"}
           </Button>
         </Box>
       </Box>
 
+      {/* Preview Section */}
       {preview && (
         <Box
           sx={{

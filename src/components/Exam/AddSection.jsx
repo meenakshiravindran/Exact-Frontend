@@ -72,7 +72,7 @@ const AddSectionDialog = ({ open, onClose, onAdd }) => {
         <TextField label="Number of Questions" type="number" fullWidth value={numQuestions} onChange={(e) => setNumQuestions(e.target.value)} sx={{ mb: 2 }} />
         <TextField label="Number to Answer" type="number" fullWidth value={numToAnswer} onChange={(e) => setNumToAnswer(e.target.value)} sx={{ mb: 2 }} />
         <TextField label="Ceiling Mark" type="number" fullWidth value={ceilingMark} onChange={(e) => setCeilingMark(e.target.value)} sx={{ mb: 2 }} />
-        <TextField label="Description (Optional)" fullWidth multiline rows={3} value={description} onChange={(e) => setDescription(e.target.value)} sx={{ mb: 2 }} />
+        <TextField label="Description" fullWidth multiline rows={3} value={description} onChange={(e) => setDescription(e.target.value)} sx={{ mb: 2 }} />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="secondary">Cancel</Button>
