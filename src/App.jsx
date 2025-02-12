@@ -35,6 +35,7 @@ import CreateInternalExam from "./components/Questions/addInternalExam";
 import EditQuestion from "./components/Questions/editQuestion";
 import ManageQuestion from "./components/Questions/manageQuestion";
 import ExamSectionPage from "./components/Exam/ExamSection";
+import PDFQuestionGenerator from "./components/Questions/generateQuestion";
 
 
 function App() {
@@ -86,6 +87,7 @@ function App() {
  
  
           <Route path="/exam-section/:int_exam_id" element={<ProtectedRoute element={<ExamSectionPage/>} allowedRoles={['teacher']} />}/>
+          <Route path="/question-generator" element={<ProtectedRoute element={<PDFQuestionGenerator/>} allowedRoles={['teacher']} />}/>
           
         </Route>
       </Routes>
