@@ -145,11 +145,7 @@ const ExamSectionPage = () => {
   
   // Handle question selection
   const handleSelectQuestions = async (sectionId, selectedQuestions) => {
-    setSections((prevSections) =>
-      prevSections.map((section) =>
-        section.id === sectionId ? { ...section, selectedQuestions } : section
-      )
-    );
+    await fetchExamSections();
   };
 
   // Handle adding a new section
@@ -188,6 +184,7 @@ const ExamSectionPage = () => {
     return <span dangerouslySetInnerHTML={{ __html: renderedText }} />;
   };
 
+  
   // Generate LaTeX preview
   const generateLatex = async () => {
     try {

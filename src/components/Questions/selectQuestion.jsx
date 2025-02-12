@@ -86,7 +86,7 @@ const SelectQuestion = ({ open, onClose, section, onSelectQuestions, existingSel
         });
   
         // Also update the section with selected questions
-        onSelectQuestions(section.id, selectedQuestions);
+        onSelectQuestions();
         onClose();
       } catch (error) {
         console.error("Error adding questions:", error);

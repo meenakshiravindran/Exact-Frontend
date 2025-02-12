@@ -59,10 +59,12 @@ const ManageFaculties = () => {
   const rows = faculties.map((faculty) => ({
     id: faculty.faculty_id,
     name: faculty.name,
+    dept:faculty.dept,
   }));
 
   const columns = [
     { field: 'name', headerName: 'Name', flex: 0.8 },
+    { field: 'dept', headerName: 'Department', flex: 0.8 },
     {
       field: 'actions',
       headerName: 'Actions',
