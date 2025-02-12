@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { TeacherDashboard } from "./Dashboard/TeacherDashboard";
 import { Person as PersonIcon } from "@mui/icons-material";
+import { AdminDashboard } from "./Dashboard/adminDashboard";
 
 export const Home = () => {
   const [name, setName] = useState("");
@@ -130,6 +131,8 @@ export const Home = () => {
             <Box>
               {role === "teacher" ? (
                 <TeacherDashboard />
+              ) : role === "admin" ? (
+                <AdminDashboard />
               ) : (
                 <Paper
                   elevation={3}
