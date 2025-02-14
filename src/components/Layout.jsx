@@ -147,31 +147,35 @@ const ExactLayout = () => {
             title="Manage"
           >
             {userRole === "admin" && (
-              <Menu.Item
-                key="/manage-faculties"
-                icon={<UsergroupAddOutlined style={{ fontSize: "20px" }} />}
+              <>
+                <Menu.Item
+                  key="/manage-faculties"
+                  icon={<UsergroupAddOutlined style={{ fontSize: "20px" }} />}
+                >
+                  <Link to="/manage-faculties">Faculties</Link>
+                </Menu.Item>
+                <Menu.Item
+                key="/manage-batches"
+                icon={<ClusterOutlined style={{ fontSize: "20px" }} />}
               >
-                <Link to="/manage-faculties">Faculties</Link>
+                <Link to="/manage-batches">Batch</Link>
               </Menu.Item>
+              <Menu.Item
+                key="/manage-courses"
+                icon={<UnorderedListOutlined style={{ fontSize: "20px" }} />}
+              >
+                <Link to="/manage-courses">Courses</Link>
+              </Menu.Item>
+              <Menu.Item
+                key="/manage-programmes"
+                icon={<AppstoreAddOutlined style={{ fontSize: "20px" }} />}
+              >
+                <Link to="/manage-programmes">Programmes</Link>
+              </Menu.Item>
+              </>
+              
             )}
-            <Menu.Item
-              key="/manage-batches"
-              icon={<ClusterOutlined style={{ fontSize: "20px" }} />}
-            >
-              <Link to="/manage-batches">Batch</Link>
-            </Menu.Item>
-            <Menu.Item
-              key="/manage-courses"
-              icon={<UnorderedListOutlined style={{ fontSize: "20px" }} />}
-            >
-              <Link to="/manage-courses">Courses</Link>
-            </Menu.Item>
-            <Menu.Item
-              key="/manage-programmes"
-              icon={<AppstoreAddOutlined style={{ fontSize: "20px" }} />}
-            >
-              <Link to="/manage-programmes">Programmes</Link>
-            </Menu.Item>
+            
             <Menu.Item
               key="/manage-students"
               icon={<TeamOutlined style={{ fontSize: "20px" }} />}
@@ -304,12 +308,6 @@ const ExactLayout = () => {
                 <Person fontSize="small" />
               </ListItemIcon>
               Profile
-            </MenuItem>
-            <MenuItem onClick={handleCloseMenu}>
-              <ListItemIcon>
-                <AccountCircle fontSize="small" />
-              </ListItemIcon>
-              My Account
             </MenuItem>
             <MenuItem onClick={handleLogout}>
               <ListItemIcon>
