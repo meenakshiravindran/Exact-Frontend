@@ -15,15 +15,19 @@ import { useNavigate } from "react-router-dom";
 
 const FacultyForm = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    first_name: "",
+    last_name: "",
     department: "",
     email: "",
     phone_number: "",
+    username: "",
+    password: "",
   });
 
   const [errors, setErrors] = useState({});
   const [departments, setDepartments] = useState([]);
   const navigate = useNavigate();
+
   // Fetch departments on component mount
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -46,17 +50,45 @@ const FacultyForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await axios.post("http://localhost:8000/add-faculty/", formData);
-      alert("Faculty member created successfully.");
-      setFormData({
-        name: "",
-        department: "",
-        email: "",
-        phone_number: "",
-      });
-      navigate('/manage-faculties')
-      setErrors({});
+      // Register the faculty as a user first
+      const registerResponse = await axios.post(
+        "http://localhost:8000/register/",
+        {
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          email: formData.email,
+          username: formData.username,
+          password: formData.password,
+          role: "teacher",
+        }
+      );
+
+      if (registerResponse.status === 201) {
+        // After successful registration, add the faculty details
+        await axios.post("http://localhost:8000/add-faculty/", {
+          name: `${formData.first_name} ${formData.last_name}`.trim(),
+          department: formData.department,
+          email: formData.email,
+          phone_number: formData.phone_number,
+          username: formData.username,
+        });
+
+        alert("Faculty member created successfully.");
+        setFormData({
+          first_name: "",
+          last_name: "",
+          department: "",
+          email: "",
+          phone_number: "",
+          username: "",
+          password: "",
+        });
+
+        navigate("/manage-faculties");
+        setErrors({});
+      }
     } catch (error) {
       if (error.response && error.response.data) {
         setErrors(error.response.data);
@@ -80,15 +112,28 @@ const FacultyForm = () => {
         <Typography variant="h4" align="center" gutterBottom>
           Add Faculty Member
         </Typography>
-        {/* Name Input */}
+
+        {/* First Name Input */}
         <TextField
           fullWidth
-          label="Name"
-          name="name"
-          value={formData.name}
+          label="First Name"
+          name="first_name"
+          value={formData.first_name}
           onChange={handleChange}
-          error={!!errors.name}
-          helperText={errors.name}
+          error={!!errors.first_name}
+          helperText={errors.first_name}
+          margin="normal"
+        />
+
+        {/* Last Name Input */}
+        <TextField
+          fullWidth
+          label="Last Name"
+          name="last_name"
+          value={formData.last_name}
+          onChange={handleChange}
+          error={!!errors.last_name}
+          helperText={errors.last_name}
           margin="normal"
         />
 
@@ -143,7 +188,32 @@ const FacultyForm = () => {
           margin="normal"
         />
 
-        {/* Submit Button */}
+        {/* Username Input */}
+        <TextField
+          fullWidth
+          label="Username"
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          error={!!errors.username}
+          helperText={errors.username}
+          margin="normal"
+        />
+
+        {/* Password Input */}
+        <TextField
+          fullWidth
+          label="Password"
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          error={!!errors.password}
+          helperText={errors.password}
+          margin="normal"
+        />
+
+        {/* Buttons */}
         <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
           <Button
             variant="outlined"
