@@ -13,13 +13,15 @@ import {
   ProjectOutlined,
   FileTextOutlined,
   FormOutlined,
+  ReadOutlined,
 } from "@ant-design/icons";
 
 import { Button, Layout, Menu, theme } from "antd";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Menu as MuiMenu, MenuItem, ListItemIcon } from "@mui/material";
 import { Space } from "antd/es";
-import { Person, AccountCircle, ExitToApp } from "@mui/icons-material";
+import { Person, AccountCircle, ExitToApp
+ } from "@mui/icons-material";
 import "../index.css";
 
 const { Header, Sider, Content, Footer } = Layout;
@@ -48,13 +50,13 @@ const ExactLayout = () => {
       }
       return ["sub1"]; // Expand only Manage
     }
-    
+
     if (currentPath.startsWith("/add-question")) {
       return ["sub4"]; // Open the Question Pool submenu
     }
-  
+
     return [];
-  };  
+  };
 
   useEffect(() => {
     const storedFullName = localStorage.getItem("full_name");
@@ -155,27 +157,26 @@ const ExactLayout = () => {
                   <Link to="/manage-faculties">Faculties</Link>
                 </Menu.Item>
                 <Menu.Item
-                key="/manage-batches"
-                icon={<ClusterOutlined style={{ fontSize: "20px" }} />}
-              >
-                <Link to="/manage-batches">Batch</Link>
-              </Menu.Item>
-              <Menu.Item
-                key="/manage-courses"
-                icon={<UnorderedListOutlined style={{ fontSize: "20px" }} />}
-              >
-                <Link to="/manage-courses">Courses</Link>
-              </Menu.Item>
-              <Menu.Item
-                key="/manage-programmes"
-                icon={<AppstoreAddOutlined style={{ fontSize: "20px" }} />}
-              >
-                <Link to="/manage-programmes">Programmes</Link>
-              </Menu.Item>
+                  key="/manage-batches"
+                  icon={<ClusterOutlined style={{ fontSize: "20px" }} />}
+                >
+                  <Link to="/manage-batches">Batch</Link>
+                </Menu.Item>
+                <Menu.Item
+                  key="/manage-courses"
+                  icon={<UnorderedListOutlined style={{ fontSize: "20px" }} />}
+                >
+                  <Link to="/manage-courses">Courses</Link>
+                </Menu.Item>
+                <Menu.Item
+                  key="/manage-programmes"
+                  icon={<AppstoreAddOutlined style={{ fontSize: "20px" }} />}
+                >
+                  <Link to="/manage-programmes">Programmes</Link>
+                </Menu.Item>
               </>
-              
             )}
-            
+
             <Menu.Item
               key="/manage-students"
               icon={<TeamOutlined style={{ fontSize: "20px" }} />}
@@ -211,7 +212,7 @@ const ExactLayout = () => {
           {userRole === "teacher" && (
             <Menu.SubMenu
               key="sub3"
-              icon={<FileTextOutlined style={{ fontSize: "20px" }} />}
+              icon={<ReadOutlined style={{ fontSize: "20px" }} />}
               title="Assessment"
             >
               <Menu.Item
@@ -222,7 +223,7 @@ const ExactLayout = () => {
               </Menu.Item>
             </Menu.SubMenu>
           )}
-            {userRole === "teacher" && (
+          {userRole === "teacher" && (
             <Menu.SubMenu
               key="sub4"
               icon={<FileTextOutlined style={{ fontSize: "20px" }} />}
@@ -303,12 +304,6 @@ const ExactLayout = () => {
             open={Boolean(anchorEl)}
             onClose={handleCloseMenu}
           >
-            <MenuItem onClick={handleCloseMenu}>
-              <ListItemIcon>
-                <Person fontSize="small" />
-              </ListItemIcon>
-              Profile
-            </MenuItem>
             <MenuItem onClick={handleLogout}>
               <ListItemIcon>
                 <ExitToApp fontSize="small" />
