@@ -11,7 +11,10 @@ import {
   Tooltip,
   IconButton,
 } from "@mui/material";
-import { Visibility as VisibilityIcon, Psychology as AIGenerateIcon } from "@mui/icons-material";
+import {
+  Visibility as VisibilityIcon,
+  Psychology as AIGenerateIcon,
+} from "@mui/icons-material";
 import axios from "axios";
 import katex from "katex";
 import "katex/dist/katex.min.css";
@@ -104,7 +107,12 @@ const QuestionForm = () => {
   return (
     <Box sx={{ display: "flex", gap: 2, padding: 2, height: "100%" }}>
       <Box sx={{ flex: 1 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={3}
+        >
           <Typography variant="h5" gutterBottom>
             Add Question
           </Typography>
@@ -112,13 +120,19 @@ const QuestionForm = () => {
           {/* Icons for Preview & AI Question Generator */}
           <Box display="flex" alignItems="center" gap={1}>
             <Tooltip title={preview ? "Hide Preview" : "Show Preview"} arrow>
-              <IconButton onClick={togglePreview} color={preview ? "primary" : "default"}>
+              <IconButton
+                onClick={togglePreview}
+                color={preview ? "primary" : "default"}
+              >
                 <VisibilityIcon />
               </IconButton>
             </Tooltip>
 
             <Tooltip title="Generate Questions with AI" arrow>
-              <IconButton onClick={toggleAiPanel} color={aiPanel ? "primary" : "default"}>
+              <IconButton
+                onClick={toggleAiPanel}
+                color={aiPanel ? "primary" : "default"}
+              >
                 <AIGenerateIcon />
               </IconButton>
             </Tooltip>
@@ -135,6 +149,56 @@ const QuestionForm = () => {
             ))}
           </Select>
         </FormControl>
+        {course && cos.length > 0 && (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 2,
+              marginBottom: 2,
+              justifyContent: "flex-start",
+            }}
+          >
+            {cos.map((coItem) => (
+              <Tooltip
+                key={coItem.co_id}
+                title={coItem.co_description}
+                placement="top"
+                arrow
+              >
+                <Box
+                  sx={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: "50%",
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: co === coItem.co_id ? "#007BFF" : "white",
+                    color: co === coItem.co_id ? "white" : "#007BFF",
+                    border: "2px solid #007BFF",
+                    transition: "all 0.3s ease",
+                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                    "&:hover": {
+                      backgroundColor: "#007BFF",
+                      color: "white",
+                      boxShadow: "0px 4px 8px rgba(0, 123, 255, 0.3)",
+                    },
+                  }}
+                  onClick={() => handleCoSelect(coItem.co_id)}
+                >
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: "bold", fontSize: "0.9rem" }}
+                  >
+                    {coItem.co_label}
+                  </Typography>
+                </Box>
+              </Tooltip>
+            ))}
+          </Box>
+        )}
 
         <TextField
           label="Marks"
@@ -158,7 +222,11 @@ const QuestionForm = () => {
         />
 
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button variant="contained" onClick={handleSubmit} sx={{ marginRight: 2 }}>
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            sx={{ marginRight: 2 }}
+          >
             Add Question
           </Button>
         </Box>

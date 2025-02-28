@@ -40,7 +40,7 @@ export const Login = () => {
       axios.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
 
       // If it's the user's first login, show the reset credentials dialog
-      if (data.is_first_login) {
+      if (data.is_first_login && data.role=="teacher") {
         setOpenDialog(true);
       } else {
         navigate("/");
