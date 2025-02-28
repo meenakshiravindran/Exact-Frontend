@@ -75,7 +75,6 @@ const RegisterForm = () => {
           fullWidth
           margin="normal"
           variant="outlined"
-          required
         />
 
         {/* Email Field */}
