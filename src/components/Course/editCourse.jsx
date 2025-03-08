@@ -21,11 +21,9 @@ const EditCourse = () => {
     semester: "",
     credits: "",
     no_of_cos: "",
-    programme: "",
     syllabus_year: "",
   });
   const [departments, setDepartments] = useState([]);
-  const [programmes, setProgrammes] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,7 +38,6 @@ const EditCourse = () => {
           semester: response.data.semester,
           credits: response.data.credits,
           no_of_cos: response.data.no_of_cos,
-          programme: response.data.programme,
           syllabus_year: response.data.syllabus_year,
         });
       })
@@ -58,15 +55,6 @@ const EditCourse = () => {
         console.error("Error fetching departments:", error);
       });
 
-    // Fetch programme list
-    axios
-      .get("http://localhost:8000/get-programme/")
-      .then((response) => {
-        setProgrammes(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching programmes:", error);
-      });
   }, [courseId]);
 
   const handleChange = (e) => {
@@ -173,29 +161,6 @@ const EditCourse = () => {
           required
           margin="normal"
         />
-
-        {/* Programme Dropdown */}
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="programme-label">Programme</InputLabel>
-          <Select
-            labelId="programme-label"
-            label="Programme"
-            id="programme"
-            name="programme"
-            value={formData.programme}
-            onChange={handleChange}
-            required
-          >
-            <MenuItem value="">
-              <em>Select Programme</em>
-            </MenuItem>
-            {programmes.map((prog) => (
-              <MenuItem key={prog.programme_id} value={prog.programme_name}>
-                {prog.programme_name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
 
         {/* Syllabus Year Input */}
         <TextField

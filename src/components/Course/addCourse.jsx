@@ -21,13 +21,11 @@ const AddCourse = () => {
     semester: "",
     credits: "",
     no_of_cos: "",
-    programme: "",
     syllabus_year: "",
   });
 
   const [errors, setErrors] = useState({});
   const [departments, setDepartments] = useState([]);
-  const [programmes, setProgrammes] = useState([]);
   const navigate = useNavigate();
 
   // Fetch departments and programmes on component mount
@@ -36,9 +34,6 @@ const AddCourse = () => {
       try {
         const deptResponse = await axios.get("http://localhost:8000/get-department/");
         setDepartments(deptResponse.data);
-
-        const progResponse = await axios.get("http://localhost:8000/get-programme/");
-        setProgrammes(progResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -63,7 +58,6 @@ const AddCourse = () => {
         semester: "",
         credits: "",
         no_of_cos: "",
-        programme: "",
         syllabus_year: "",
       });
       navigate("/manage-courses");
@@ -180,32 +174,6 @@ const AddCourse = () => {
           helperText={errors.no_of_cos}
           margin="normal"
         />
-
-        {/* Programme Dropdown */}
-        <FormControl fullWidth margin="normal" error={!!errors.programme}>
-          <InputLabel id="programme-label">Programme</InputLabel>
-          <Select
-            labelId="programme-label"
-            label="Programme"
-            name="programme"
-            value={formData.programme}
-            onChange={handleChange}
-          >
-            <MenuItem value="">
-              <em>Select Programme</em>
-            </MenuItem>
-            {programmes.map((prog) => (
-              <MenuItem key={prog.prog_id} value={prog.programme_name}>
-                {prog.programme_name}
-              </MenuItem>
-            ))}
-          </Select>
-          {errors.programme && (
-            <Typography variant="caption" color="error">
-              {errors.programme}
-            </Typography>
-          )}
-        </FormControl>
 
         {/* Syllabus Year Input */}
         <TextField
