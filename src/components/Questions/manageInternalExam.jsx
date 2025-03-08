@@ -22,6 +22,7 @@ import {
   Grade as GradeIcon,
   Visibility as VisibilityIcon,
   Delete as DeleteIcon,
+  SentimentDissatisfied as NoDataIcon, 
 } from "@mui/icons-material";
 import CreateInternalExam from "./addInternalExam";
 
@@ -107,58 +108,74 @@ export const InternalExamList = () => {
         </Button>
       </Box>
 
-      <Box display="flex" flexWrap="wrap" gap={3}>
-        {combinedData.map((exam) => (
-          <Card
-            key={exam.int_exam_id}
-            sx={{
-              width: "100%",
-              maxWidth: 345,
-              display: "flex",
-              flexDirection: "column",
-              transition: "0.3s",
-              "&:hover": { transform: "translateY(-5px)", boxShadow: 4 },
-            }}
-          >
-            <CardContent sx={{ flexGrow: 1 }}>
-              <Typography variant="h6" gutterBottom>{exam.exam_name}</Typography>
-              <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                {exam.batch.course__title}
-              </Typography>
-              <Box display="flex" alignItems="center" mb={1}>
-                <SchoolIcon fontSize="small" sx={{ mr: 1, color: "primary.main" }} />
-                <Typography variant="body2">Year: {exam.batch.year}, Part: {exam.batch.part}</Typography>
-              </Box>
-              <Box display="flex" alignItems="center" mb={1}>
-                <AccessTimeIcon fontSize="small" sx={{ mr: 1, color: "secondary.main" }} />
-                <Typography variant="body2">Duration: {exam.duration} mins</Typography>
-              </Box>
-              <Box display="flex" alignItems="center" mb={2}>
-                <GradeIcon fontSize="small" sx={{ mr: 1, color: "success.main" }} />
-                <Typography variant="body2">Max Marks: {exam.max_marks}</Typography>
-              </Box>
-              <Box display="flex" justifyContent="flex-start" gap={0.5}>
-                <Button
-                  variant="text"
-                  color="secondary"
-                  onClick={() => handleViewExam(exam.int_exam_id)}
-                  sx={{ minWidth: "40px", padding: "8px" }}
-                >
-                  <VisibilityIcon />
-                </Button>
-                <Button
-                  variant='text'
-                  color="error"
-                  onClick={() => handleDeleteExam(exam.int_exam_id)}
-                  sx={{ minWidth: "40px", padding: "4px" }}
-                >
-                  <DeleteIcon />
-                </Button>
-            </Box>
-            </CardContent>
-          </Card>
-        ))}
-      </Box>
+      {combinedData.length === 0 ? (
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          width="100%"
+          py={6}
+        >
+          <NoDataIcon sx={{ fontSize: 80, color: "gray" }} /> {/* No data icon */}
+          <Typography variant="h6" color="text.secondary" mt={2}>
+            No internal exams found.
+          </Typography>
+        </Box>
+      ) : (
+        <Box display="flex" flexWrap="wrap" gap={3}>
+          {combinedData.map((exam) => (
+            <Card
+              key={exam.int_exam_id}
+              sx={{
+                width: "100%",
+                maxWidth: 345,
+                display: "flex",
+                flexDirection: "column",
+                transition: "0.3s",
+                "&:hover": { transform: "translateY(-5px)", boxShadow: 4 },
+              }}
+            >
+              <CardContent sx={{ flexGrow: 1 }}>
+                <Typography variant="h6" gutterBottom>{exam.exam_name}</Typography>
+                <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                  {exam.batch.course__title}
+                </Typography>
+                <Box display="flex" alignItems="center" mb={1}>
+                  <SchoolIcon fontSize="small" sx={{ mr: 1, color: "primary.main" }} />
+                  <Typography variant="body2">Year: {exam.batch.year}, Part: {exam.batch.part}</Typography>
+                </Box>
+                <Box display="flex" alignItems="center" mb={1}>
+                  <AccessTimeIcon fontSize="small" sx={{ mr: 1, color: "secondary.main" }} />
+                  <Typography variant="body2">Duration: {exam.duration} mins</Typography>
+                </Box>
+                <Box display="flex" alignItems="center" mb={2}>
+                  <GradeIcon fontSize="small" sx={{ mr: 1, color: "success.main" }} />
+                  <Typography variant="body2">Max Marks: {exam.max_marks}</Typography>
+                </Box>
+                <Box display="flex" justifyContent="flex-start" gap={0.5}>
+                  <Button
+                    variant="text"
+                    color="secondary"
+                    onClick={() => handleViewExam(exam.int_exam_id)}
+                    sx={{ minWidth: "40px", padding: "8px" }}
+                  >
+                    <VisibilityIcon />
+                  </Button>
+                  <Button
+                    variant="text"
+                    color="error"
+                    onClick={() => handleDeleteExam(exam.int_exam_id)}
+                    sx={{ minWidth: "40px", padding: "4px" }}
+                  >
+                    <DeleteIcon />
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+      )}
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Select a Batch</DialogTitle>

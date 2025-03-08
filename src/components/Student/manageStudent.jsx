@@ -13,19 +13,27 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
+  Snackbar,
+  Typography,
+  Paper,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { Upload } from "@mui/icons-material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { useDropzone } from "react-dropzone";
 
 const ManageStudents = () => {
   const [students, setStudents] = useState([]);
   const [programmes, setProgrammes] = useState([]);
   const [selectedProgramme, setSelectedProgramme] = useState("");
   const [open, setOpen] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState(null);
+  const [file, setFile] = useState(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   useEffect(() => {
     axios
@@ -37,23 +45,24 @@ const ManageStudents = () => {
         console.error("Error fetching programme data:", error);
       });
   }, []);
+
+  // Function to fetch students
+  const fetchStudents = async () => {
+    try {
+      const response = await axios.get(
+        selectedProgramme
+          ? `http://localhost:8000/students/by-programme/${selectedProgramme}/`
+          : "http://localhost:8000/get-students/"
+      );
+      setStudents(response.data);
+    } catch (error) {
+      console.error("Error fetching student data:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const response = await axios.get(
-          selectedProgramme
-            ? `http://localhost:8000/students/by-programme/${selectedProgramme}/`
-            : "http://localhost:8000/get-students/"
-        );
-        setStudents(response.data);
-      } catch (error) {
-        console.error("Error fetching student data:", error);
-      }
-    };
-  
     fetchStudents();
   }, [selectedProgramme]);
-  
 
   const handleDelete = () => {
     axios
@@ -79,16 +88,50 @@ const ManageStudents = () => {
     setSelectedStudentId(null);
   };
 
+  const handleUploadDialogOpen = () => {
+    setUploadDialogOpen(true);
+  };
+
+  const handleUploadDialogClose = () => {
+    setUploadDialogOpen(false);
+    setFile(null);
+  };
+
+  const handleUpload = async () => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      await axios.post("http://localhost:8000/upload-students/", formData);
+      setUploadSuccess(true);
+      setFile(null);
+      setUploadDialogOpen(false);
+      fetchStudents(); // Refresh DataGrid after upload
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: ".csv",
+    onDrop: (acceptedFiles) => {
+      setFile(acceptedFiles[0]);
+    },
+  });
+
   const rows = students.map((student) => ({
-    id: student.student_id,
+    id: student.register_no,
     name: student.name,
-    register_no: student.register_no,
+    programme_name: student["programme__programme_name"],
     year_of_admission: student.year_of_admission,
   }));
 
   const columns = [
+    { field: "id", headerName: "Register No", flex: 0.2 },
     { field: "name", headerName: "Name", flex: 0.2 },
-    { field: "register_no", headerName: "Register No", flex: 0.2 },
+    { field: "programme_name", headerName: "Programme", flex: 0.2 },
     { field: "year_of_admission", headerName: "Year of Admission", flex: 0.2 },
     {
       field: "actions",
@@ -105,7 +148,7 @@ const ManageStudents = () => {
             </IconButton>
           </Link>
           <IconButton
-            color="secondary"
+            color="error"
             size="small"
             onClick={() => handleDialogOpen(params.row.id)}
           >
@@ -118,9 +161,21 @@ const ManageStudents = () => {
 
   return (
     <Container sx={{ marginTop: 5 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <h2>Manage Students</h2>
-        <Box>
+        <Box display="flex" gap={2}>
+          <Button
+            variant="contained"
+            startIcon={<Upload />}
+            onClick={handleUploadDialogOpen}
+          >
+            Upload CSV
+          </Button>
           <Link to="/add-student">
             <Button variant="contained" color="success">
               Add New Student
@@ -148,23 +203,55 @@ const ManageStudents = () => {
         </Select>
       </FormControl>
 
-      <div style={{ height: 400, width: "100%" }}>
-        <DataGrid rows={rows} columns={columns} pageSize={5} />
-      </div>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        pageSizeOptions={[30]}
+        pageSize={10}
+        pagination
+      />
 
-      <Dialog open={open} onClose={handleDialogClose}>
-        <DialogTitle>Confirm Deletion</DialogTitle>
+      <Snackbar
+        open={uploadSuccess}
+        autoHideDuration={3000}
+        onClose={() => setUploadSuccess(false)}
+        message="File uploaded successfully!"
+      />
+
+      {/* Upload CSV Dialog */}
+      <Dialog open={uploadDialogOpen} onClose={handleUploadDialogClose}>
+        <DialogTitle>Upload CSV File</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this student? This action cannot be undone.
-          </DialogContentText>
+          <Paper
+            {...getRootProps()}
+            sx={{
+              padding: 3,
+              textAlign: "center",
+              border: "2px dashed #ccc",
+              cursor: "pointer",
+              mb: 2,
+              boxShadow: "none",
+            }}
+          >
+            <input {...getInputProps()} />
+            <CloudUploadIcon fontSize="large" />
+            <Typography>
+              Drag & Drop a CSV file here or click to select one
+            </Typography>
+          </Paper>
+          {file && <Typography>Selected File: {file.name}</Typography>}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
+          <Button onClick={handleUploadDialogClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleDelete} color="secondary" variant="contained">
-            Delete
+          <Button
+            onClick={handleUpload}
+            color="primary"
+            variant="contained"
+            disabled={!file}
+          >
+            Upload
           </Button>
         </DialogActions>
       </Dialog>
