@@ -29,14 +29,12 @@ const ManageCO = () => {
     label: co.co_label,
     description: co.co_description,
     course: co.course,
-    programme: co.programme,
   }));
 
   const columns = [
     { field: "label", headerName: "CO Label", flex: 0.3 },
     { field: "description", headerName: "Description", flex: 0.5 },
     { field: "course", headerName: "Course", flex: 0.5 },
-    { field: "programme", headerName: "Programme", flex: 0.5 },
     {
       field: "actions",
       headerName: "Actions",
@@ -52,7 +50,7 @@ const ManageCO = () => {
             </IconButton>
           </Link>
           <IconButton
-            color="secondary"
+            color="error"
             size="small"
             onClick={() => handleDelete(params.row.id)}
           >
