@@ -64,10 +64,10 @@ export default function LoginPage() {
                 textAlign: "left",
               }}
             >
-              Bridging curriculum
+              Crafting Questions, Shaping Minds
               <br />
-              <span style={{ color: "purple" }}>
-                goals with measurable outcomes.
+              <span style={{ color: "purple", fontSize: "48px"}}>
+              where exams meet precision. 
               </span>
             </Typography>
           </Box>

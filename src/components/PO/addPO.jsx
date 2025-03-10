@@ -58,7 +58,7 @@ const AddProgrammeOutcome = () => {
 
         <TextField
           fullWidth
-          label="PO Number"
+          label="PO Label"
           name="po_number"
           value={formData.po_number}
           onChange={handleChange}
