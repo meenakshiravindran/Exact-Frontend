@@ -10,10 +10,14 @@ import {
   InputLabel,
   FormControl,
   Box,
+  Drawer,
+  Typography,
+  IconButton,
 } from "@mui/material";
+import { Close } from "@mui/icons-material";
 
-const EditProgramme = () => {
-  const { programmeId } = useParams();
+const EditProgramme = ({ open, onClose, programmeId, refreshProgrammes }) => {
+  // const { programmeId } = useParams();
   const [formData, setFormData] = useState({
     programme_name: "",
     dept: "",
@@ -25,7 +29,8 @@ const EditProgramme = () => {
   const [levels, setLevels] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => { 
+  useEffect(() => {
+    if (!programmeId) return;
     // Fetch the current programme details
     axios
       .get(`http://localhost:8000/programme/${programmeId}/`)
@@ -71,117 +76,116 @@ const EditProgramme = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    axios
-      .put(`http://localhost:8000/programme/edit/${programmeId}/`, formData)
-      .then(() => {
-        navigate("/manage-programmes");
-      })
-      .catch((error) => {
-        console.error("Error updating programme:", error);
-      });
+    try {
+      await axios.put(
+        `http://localhost:8000/programme/edit/${programmeId}/`,
+        formData
+      );
+      alert("Programme updated successfully.");
+      onClose();
+      refreshProgrammes();
+    } catch (error) {
+      console.error("Error updating programme:", error);
+    }
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 5 }}>
-      <h2>Edit Programme</h2>
-      <form onSubmit={handleSubmit}>
-        {/* Programme Name Input */}
-        <TextField
-          fullWidth
-          label="Programme Name"
-          name="programme_name"
-          value={formData.programme_name}
-          onChange={handleChange}
-          required
-          margin="normal"
-        />
-
-        {/* Department Dropdown */}
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="dept-label">Department</InputLabel>
-          <Select
-            labelId="dept-label"
-            label="Department"
-            id="dept"
-            name="dept"
-            value={formData.dept}
-            onChange={handleChange}
-            required
-          >
-            <MenuItem value="">
-              <em>Select Department</em>
-            </MenuItem>
-            {departments.map((dept) => (
-              <MenuItem key={dept.dept_id} value={dept.dept_name}>
-                {dept.dept_name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* Number of Positions Input */}
-        <TextField
-          fullWidth
-          label="Number of Positions"
-          name="no_of_pos"
-          type="number"
-          value={formData.no_of_pos}
-          onChange={handleChange}
-          required
-          margin="normal"
-        />
-
-        {/* Level Dropdown */}
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="level-label">Level</InputLabel>
-          <Select
-            labelId="level-label"
-            label="Level"
-            id="level"
-            name="level"
-            value={formData.level}
-            onChange={handleChange}
-            required
-          >
-            <MenuItem value="">
-              <em>Select Level</em>
-            </MenuItem>
-            {levels.map((level) => (
-              <MenuItem key={level.level_id} value={level.level_name}>
-                {level.level_name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* Duration Input */}
-        <TextField
-          fullWidth
-          label="Duration (in years)"
-          name="duration"
-          value={formData.duration}
-          onChange={handleChange}
-          required
-          margin="normal"
-        />
-
-        {/* Buttons */}
-        <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => navigate("/manage-programmes")}
-          >
-            Back
-          </Button>
-          <Button variant="contained" type="submit">
-            Update Programme
-          </Button>
+    <Drawer anchor="right" open={open} onClose={onClose}>
+      <Box sx={{ width: 600, p: 3 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="h5">Edit Programme</Typography>
+          <IconButton onClick={onClose}>
+            <Close />
+          </IconButton>
         </Box>
-      </form>
-    </Container>
+
+        <form onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            label="Programme Name"
+            name="programme_name"
+            value={formData.programme_name}
+            onChange={handleChange}
+            required
+            margin="normal"
+          />
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="dept_label">Department</InputLabel>
+            <Select
+              labelId="dept-label"
+              label="Department"
+              id="dept"
+              name="dept"
+              value={formData.dept}
+              onChange={handleChange}
+              required
+            >
+              <MenuItem value="">
+                <em>Select Department</em>
+              </MenuItem>
+              {departments.map((dept) => (
+                <MenuItem key={dept.dept_id} value={dept.dept_name}>
+                  {dept.dept_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            fullWidth
+            label="Number of Positions"
+            name="no_of_pos"
+            type="number"
+            value={formData.no_of_pos}
+            onChange={handleChange}
+            required
+            margin="normal"
+          />
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="level-label">Level</InputLabel>
+            <Select
+              labelId="level-label"
+              label="Level"
+              id="level"
+              name="level"
+              value={formData.level}
+              onChange={handleChange}
+              required
+            >
+              <MenuItem value="">
+                <em>Select Level</em>
+              </MenuItem>
+              {levels.map((level) => (
+                <MenuItem key={level.level_id} value={level.level_name}>
+                  {level.level_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            fullWidth
+            label="Duration (in years)"
+            name="duration"
+            type="number"
+            required
+            value={formData.duration}
+            onChange={handleChange}
+            margin="normal"
+          />
+
+          <Box mt={2} display="flex" justifyContent="flex-end">
+            <Button variant="contained" type="submit">
+              Update Programme
+            </Button>
+          </Box>
+        </form>
+      </Box>
+    </Drawer>
   );
 };
 

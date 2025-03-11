@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
 import {
   Button,
   Container,
@@ -11,18 +10,20 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Drawer,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddProgramme from "./addProgramme";
+import EditProgramme from "./editProgramme";
 
 const ManageProgrammes = () => {
   const [programmes, setProgrammes] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [selectedProgramme, setSelectedProgramme] = useState(null);
+  const [openAddDrawer, setOpenAddDrawer] = useState(false);
+  const [openEditDrawer, setOpenEditDrawer] = useState(false);
+  const [selectedProgrammeId, setSelectedProgrammeId] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
   const fetchProgrammes = () => {
     axios
       .get("http://localhost:8000/get-programme/")
@@ -34,32 +35,28 @@ const ManageProgrammes = () => {
     fetchProgrammes();
   }, []);
 
-  const handleOpenDialog = (programmeId) => {
-    setSelectedProgramme(programmeId);
-    setOpen(true);
+  const handleOpenEditDrawer = (programmeId) => {
+    setSelectedProgrammeId(programmeId);
+    setOpenEditDrawer(true);
   };
 
-  const handleCloseDialog = () => {
-    setOpen(false);
-    setSelectedProgramme(null);
+  const handleOpenDeleteDialog = (programmeId) => {
+    setSelectedProgrammeId(programmeId);
+    setDeleteDialogOpen(true);
   };
 
-  const handleDelete = () => {
-    if (selectedProgramme) {
-      axios
-        .delete(`http://localhost:8000/programmes/delete/${selectedProgramme}/`)
-        .then(() => {
-          setProgrammes(
-            programmes.filter(
-              (programme) => programme.programme_id !== selectedProgramme
-            )
-          );
-          handleCloseDialog();
-        })
-        .catch((error) => {
-          console.error("Error deleting programme:", error);
-        });
-    }
+  const handleDeleteProgramme = () => {
+    axios
+      .delete(`http://localhost:8000/programmes/delete/${selectedProgrammeId}/`)
+      .then(() => {
+        setProgrammes((prev) =>
+          prev.filter(
+            (programme) => programme.programme_id !== selectedProgrammeId
+          )
+        );
+        setDeleteDialogOpen(false);
+      })
+      .catch((error) => console.error("Error deleting programme:", error));
   };
 
   const rows = programmes.map((programme) => ({
@@ -81,16 +78,18 @@ const ManageProgrammes = () => {
       align: "center",
       sortable: false,
       renderCell: (params) => (
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <Link to={`/edit-programme/${params.row.id}`}>
-            <IconButton color="primary" size="small" sx={{ marginRight: 1 }}>
-              <EditIcon />
-            </IconButton>
-          </Link>
+        <div style={{ display: "flex", justifyContent: "center" ,height: "100%",width:"100%"}}>
+          <IconButton
+            color="primary"
+            size="small"
+            onClick={() => handleOpenEditDrawer(params.row.id)}
+          >
+            <EditIcon />
+          </IconButton>
           <IconButton
             color="error"
             size="small"
-            onClick={() => handleOpenDialog(params.row.id)}
+            onClick={() => handleOpenDeleteDialog(params.row.id)}
           >
             <DeleteIcon />
           </IconButton>
@@ -101,24 +100,11 @@ const ManageProgrammes = () => {
 
   return (
     <Container sx={{ marginTop: 5 }}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
-        <Box>
-          <h2>Manage Programmes</h2>
-        </Box>
-        <Box>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={() => setOpenDrawer(true)}
-          >
-            Add New Programme
-          </Button>
-        </Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <h2>Manage Programmes</h2>
+        <Button variant="contained" onClick={() => setOpenAddDrawer(true)}>
+          Add New Programme
+        </Button>
       </Box>
       <DataGrid
         rows={rows}
@@ -127,8 +113,10 @@ const ManageProgrammes = () => {
         slots={{ Toolbar: GridToolbar }}
       />
 
-      {/* Confirmation Dialog */}
-      <Dialog open={open} onClose={handleCloseDialog}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -137,18 +125,22 @@ const ManageProgrammes = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleDelete} color="secondary">
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleDeleteProgramme} color="error">
             Delete
           </Button>
         </DialogActions>
       </Dialog>
 
       <AddProgramme
-        open={openDrawer}
-        onClose={() => setOpenDrawer(false)}
+        open={openAddDrawer}
+        onClose={() => setOpenAddDrawer(false)}
+        refreshProgrammes={fetchProgrammes}
+      />
+      <EditProgramme
+        open={openEditDrawer}
+        onClose={() => setOpenEditDrawer(false)}
+        programmeId={selectedProgrammeId}
         refreshProgrammes={fetchProgrammes}
       />
     </Container>
