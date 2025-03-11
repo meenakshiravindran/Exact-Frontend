@@ -13,6 +13,7 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Autocomplete,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -92,24 +93,24 @@ const AddCO = () => {
           Add CO
         </Typography>
 
+        {/* Course Dropdown */}
         <FormControl fullWidth margin="normal" error={!!errors.course}>
-          <InputLabel id="course-label">Course</InputLabel>
-          <Select
-            labelId="course-label"
-            label="Course"
-            name="course"
-            value={formData.course}
-            onChange={handleChange}
-          >
-            <MenuItem value="">
-              <em>Select Course</em>
-            </MenuItem>
-            {courses.map((course) => (
-              <MenuItem key={course.id} value={course.title}>
-                {course.title}
-              </MenuItem>
-            ))}
-          </Select>
+          <Autocomplete
+            options={courses}
+            getOptionLabel={(option) => option.title}
+            value={
+              courses.find((course) => course.title === formData.course) || null
+            }
+            onChange={(event, newValue) => {
+              setFormData({
+                ...formData,
+                course: newValue ? newValue.title : "",
+              });
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Select Course" variant="outlined" />
+            )}
+          />
           {errors.course && (
             <Typography variant="caption" color="error">
               {errors.course}
@@ -141,7 +142,11 @@ const AddCO = () => {
           margin="normal"
         />
 
-        <FormControl component="fieldset" margin="normal" error={!!errors.bloom_taxonomy}>
+        <FormControl
+          component="fieldset"
+          margin="normal"
+          error={!!errors.bloom_taxonomy}
+        >
           <Typography variant="h6">Select Bloom's Taxonomy Levels</Typography>
           <FormGroup>
             {[
