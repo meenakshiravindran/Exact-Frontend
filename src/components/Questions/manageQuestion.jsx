@@ -74,7 +74,7 @@ const ManageQuestion = () => {
               <EditIcon />
             </IconButton>
           </Link>
-          <IconButton color="secondary" size="small" onClick={() => handleOpenDialog(params.row.id)}>
+          <IconButton color="error" size="small" onClick={() => handleOpenDialog(params.row.id)}>
             <DeleteIcon />
           </IconButton>
         </div>
