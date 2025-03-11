@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
-  Container,
+  Drawer,
   TextField,
   Button,
   Box,
@@ -10,12 +10,14 @@ import {
   Select,
   FormControl,
   InputLabel,
+  IconButton,
   FormControlLabel,
   Checkbox,
+  Autocomplete,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import CloseIcon from "@mui/icons-material/Close";
 
-const BatchForm = () => {
+const AddBatchDrawer = ({ open, onClose, refreshBatches }) => {
   const [formData, setFormData] = useState({
     course: "",
     faculty_id: "",
@@ -27,30 +29,23 @@ const BatchForm = () => {
   const [errors, setErrors] = useState({});
   const [faculties, setFaculties] = useState([]);
   const [courses, setCourses] = useState([]);
-  const navigate = useNavigate();
 
   // Fetch faculties and courses on component mount
   useEffect(() => {
-    const fetchFaculties = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/get-faculty/");
-        setFaculties(response.data);
+        const [facultyRes, courseRes] = await Promise.all([
+          axios.get("http://localhost:8000/get-faculty/"),
+          axios.get("http://localhost:8000/get-courses/"),
+        ]);
+        setFaculties(facultyRes.data);
+        setCourses(courseRes.data);
       } catch (error) {
-        console.error("Error fetching faculties:", error);
+        console.error("Error fetching dropdown data:", error);
       }
     };
 
-    const fetchCourses = async () => {
-      try {
-        const response = await axios.get("http://localhost:8000/get-courses/");
-        setCourses(response.data);
-      } catch (error) {
-        console.error("Error fetching courses:", error);
-      }
-    };
-
-    fetchFaculties();
-    fetchCourses();
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
@@ -73,8 +68,9 @@ const BatchForm = () => {
         part: "",
         active: false,
       });
-      navigate("/manage-batches");
       setErrors({});
+      onClose(); // Close drawer
+      refreshBatches(); // Refresh batch list
     } catch (error) {
       if (error.response && error.response.data) {
         setErrors(error.response.data);
@@ -85,102 +81,99 @@ const BatchForm = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 5 }}>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{
-          p: 3,
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-        }}
-      >
-        <Typography variant="h4" align="center" gutterBottom>
-          Add Batch
-        </Typography>
+    <Drawer anchor="right" open={open} onClose={onClose}>
+      <Box sx={{ width: 500, p: 3 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="h5">Add Batch</Typography>
+          <IconButton onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
 
-        {/* Course Dropdown */}
-        <FormControl fullWidth margin="normal" error={!!errors.course}>
-          <InputLabel id="course-label">Course</InputLabel>
-          <Select
-            labelId="course-label"
-            label="Course"
-            name="course"
-            value={formData.course}
+        <form onSubmit={handleSubmit}>
+          {/* Course Dropdown */}
+          <FormControl fullWidth margin="normal" error={!!errors.course}>
+            <Autocomplete
+              options={courses}
+              getOptionLabel={(option) => option.title}
+              value={
+                courses.find((course) => course.title === formData.course) ||
+                null
+              }
+              onChange={(event, newValue) => {
+                setFormData({
+                  ...formData,
+                  course: newValue ? newValue.title : "",
+                });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Course"
+                  variant="outlined"
+                />
+              )}
+            />
+            {errors.course && (
+              <Typography variant="caption" color="error">
+                {errors.course}
+              </Typography>
+            )}
+          </FormControl>
+          {/* Faculty Dropdown */}
+          <FormControl fullWidth margin="normal" error={!!errors.faculty_id}>
+            <Autocomplete
+              options={faculties}
+              getOptionLabel={(option) => option.name}
+              value={
+                faculties.find(
+                  (faculty) => faculty.faculty_id === formData.faculty_id
+                ) || null
+              }
+              onChange={(event, newValue) => {
+                setFormData({
+                  ...formData,
+                  faculty_id: newValue ? newValue.faculty_id : "",
+                });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Faculty"
+                  variant="outlined"
+                  error={!!errors.faculty_id}
+                  helperText={errors.faculty_id || ""}
+                />
+              )}
+            />
+          </FormControl>
+          {/* Year Input */}
+          <TextField
+            fullWidth
+            label="Year"
+            name="year"
+            type="number"
+            value={formData.year}
             onChange={handleChange}
-          >
-            <MenuItem value="">
-              <em>Select Course</em>
-            </MenuItem>
-            {courses.map((course) => (
-              <MenuItem key={course.course_id} value={course.title}>
-                {course.title}
-              </MenuItem>
-            ))}
-          </Select>
-          {errors.course && (
-            <Typography variant="caption" color="error">
-              {errors.course}
-            </Typography>
-          )}
-        </FormControl>
-
-        {/* Faculty Dropdown */}
-        <FormControl fullWidth margin="normal" error={!!errors.faculty_id}>
-          <InputLabel id="faculty-label">Faculty</InputLabel>
-          <Select
-            labelId="faculty-label"
-            label="Faculty"
-            name="faculty_id"
-            value={formData.faculty_id}
+            error={!!errors.year}
+            helperText={errors.year}
+            margin="normal"
+          />
+          {/* Part Input */}
+          <TextField
+            fullWidth
+            label="Part"
+            name="part"
+            value={formData.part}
             onChange={handleChange}
-          >
-            <MenuItem value="">
-              <em>Select Faculty</em>
-            </MenuItem>
-            {faculties.map((faculty) => (
-              <MenuItem key={faculty.faculty_id} value={faculty.faculty_id}>
-                {faculty.name}
-              </MenuItem>
-            ))}
-          </Select>
-          {errors.faculty_id && (
-            <Typography variant="caption" color="error">
-              {errors.faculty_id}
-            </Typography>
-          )}
-        </FormControl>
-
-        {/* Year Input */}
-        <TextField
-          fullWidth
-          label="Year"
-          name="year"
-          type="number"
-          value={formData.year}
-          onChange={handleChange}
-          error={!!errors.year}
-          helperText={errors.year}
-          margin="normal"
-        />
-
-        {/* Part Input */}
-        <TextField
-          fullWidth
-          label="Part"
-          name="part"
-          value={formData.part}
-          onChange={handleChange}
-          error={!!errors.part}
-          helperText={errors.part}
-          margin="normal"
-        />
-
-        {/* Active Checkbox */}
+            error={!!errors.part}
+            helperText={errors.part}
+            margin="normal"
+          />
+          {/* Active Checkbox */}
           <FormControlLabel
             control={
               <Checkbox
-                id="active"
                 name="active"
                 checked={formData.active}
                 onChange={handleChange}
@@ -188,23 +181,16 @@ const BatchForm = () => {
             }
             label="Active"
           />
-
-        {/* Submit Button */}
-        <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => navigate("/manage-batches")}
-          >
-            Back
-          </Button>
-          <Button variant="contained" type="submit">
-            Submit
-          </Button>
-        </Box>
+          {/* Submit Button */}
+          <Box mt={2} display="flex" justifyContent="flex-end">
+            <Button variant="contained" type="submit">
+              Submit
+            </Button>
+          </Box>
+        </form>
       </Box>
-    </Container>
+    </Drawer>
   );
 };
 
-export default BatchForm;
+export default AddBatchDrawer;
