@@ -122,14 +122,15 @@ const ManageStudents = () => {
   });
 
   const rows = students.map((student) => ({
-    id: student.register_no,
+    id: student.student_id,
+    reg_no: student.register_no,
     name: student.name,
     programme_name: student["programme__programme_name"],
     year_of_admission: student.year_of_admission,
   }));
 
   const columns = [
-    { field: "id", headerName: "Register No", flex: 0.2 },
+    { field: "reg_no", headerName: "Register No", flex: 0.2 },
     { field: "name", headerName: "Name", flex: 0.2 },
     { field: "programme_name", headerName: "Programme", flex: 0.2 },
     { field: "year_of_admission", headerName: "Year of Admission", flex: 0.2 },
