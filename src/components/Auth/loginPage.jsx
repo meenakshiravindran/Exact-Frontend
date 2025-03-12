@@ -5,7 +5,7 @@ import { Login } from "./login";
 
 export default function LoginPage() {
   return (
-    <Box sx={{ height: "100vh", width: "100vw", backgroundColor: "#f5f7fa" }}>
+    <Box sx={{ height: "100vh", width: "100vw", backgroundColor: "#f5f7fa",  overflow:"hidden"}}>
       {/* Header Section */}
       <Box
         sx={{
@@ -64,7 +64,7 @@ export default function LoginPage() {
                 textAlign: "left",
               }}
             >
-              Crafting Questions, Shaping Minds
+              Crafting questions, shaping minds
               <br />
               <span style={{ color: "purple", fontSize: "48px"}}>
               where exams meet precision. 

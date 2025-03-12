@@ -129,7 +129,7 @@ const ManageFaculties = () => {
             </IconButton>
           </Link>
           <IconButton
-            color="secondary"
+            color="error"
             size="small"
             onClick={() => handleDialogOpen(params.row.id)}
           >

@@ -10,15 +10,20 @@ import {
   FormControl,
   Tooltip,
   IconButton,
+  Autocomplete,
 } from "@mui/material";
 import {
   Visibility as VisibilityIcon,
   Psychology as AIGenerateIcon,
+  BackHand,
+  ForkLeft,
+  ChevronLeft,
 } from "@mui/icons-material";
 import axios from "axios";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 import PDFQuestionGenerator from "./generateQuestion"; // Importing AI PDF generator
+import { useNavigate } from "react-router-dom";
 
 const QuestionForm = () => {
   const [question, setQuestion] = useState("");
@@ -30,6 +35,7 @@ const QuestionForm = () => {
   const [preview, setPreview] = useState(false);
   const previewRef = useRef(null);
   const [aiPanel, setAiPanel] = useState(false); // State for AI panel
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -104,6 +110,8 @@ const QuestionForm = () => {
     }
   }, [question, preview, previewRef]);
 
+  const handleBack = () => navigate("/manage-question");
+
   return (
     <Box sx={{ display: "flex", gap: 2, padding: 2, height: "100%" }}>
       <Box sx={{ flex: 1 }}>
@@ -140,15 +148,20 @@ const QuestionForm = () => {
         </Box>
 
         <FormControl fullWidth sx={{ marginBottom: 2 }}>
-          <InputLabel>Course</InputLabel>
-          <Select value={course} onChange={handleCourseChange} label="Course">
-            {courses.map((course) => (
-              <MenuItem key={course.course_id} value={course.course_id}>
-                {course.title}
-              </MenuItem>
-            ))}
-          </Select>
+          <Autocomplete
+            options={courses}
+            getOptionLabel={(course) => course.title} // Display course title
+            value={courses.find((c) => c.course_id === course) || null}
+            onChange={(event, newValue) => {
+              setCourse(newValue ? newValue.course_id : "");
+              setCo(null); // Reset CO selection when course changes
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Select Course" />
+            )}
+          />
         </FormControl>
+
         {course && cos.length > 0 && (
           <Box
             sx={{
@@ -221,11 +234,17 @@ const QuestionForm = () => {
           sx={{ marginBottom: 2 }}
         />
 
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between",width:"100%" }}>
+          <Button
+            startIcon={<ChevronLeft />}
+            onClick={handleBack}
+            sx={{ marginBottom: 2 }}
+          >
+            Back to Manage Questions
+          </Button>
           <Button
             variant="contained"
             onClick={handleSubmit}
-            sx={{ marginRight: 2 }}
           >
             Add Question
           </Button>

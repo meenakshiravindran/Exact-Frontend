@@ -144,7 +144,6 @@ const EditStudent = () => {
           type="tel"
           value={formData.phone_number}
           onChange={handleChange}
-          required
           margin="normal"
         />
 
@@ -156,7 +155,6 @@ const EditStudent = () => {
           type="email"
           value={formData.email}
           onChange={handleChange}
-          required
           margin="normal"
         />
 
