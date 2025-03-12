@@ -48,7 +48,6 @@ const ManageQuestion = () => {
     id: q.question_id,
     text: q.question_text,
     marks: q.marks,
-    programme: q.programme,
     course: q.course,
     co: q.co_label,
   }));
@@ -57,7 +56,6 @@ const ManageQuestion = () => {
     { field: "id", headerName: "ID", flex: 0.1 },
     { field: "text", headerName: "Question", flex: 0.5 },
     { field: "marks", headerName: "Marks", flex: 0.1 },
-    { field: "programme", headerName: "Programme", flex: 0.4 },
     { field: "course", headerName: "Course", flex: 0.4 },
     { field: "co", headerName: "CO", flex: 0.1 },
     {
