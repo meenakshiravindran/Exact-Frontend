@@ -17,6 +17,7 @@ import {
   Snackbar,
   Typography,
   Paper,
+  DialogContentText,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
@@ -253,6 +254,22 @@ const ManageStudents = () => {
             disabled={!file}
           >
             Upload
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={open} onClose={handleDialogClose}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this student? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="secondary" variant="contained">
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
