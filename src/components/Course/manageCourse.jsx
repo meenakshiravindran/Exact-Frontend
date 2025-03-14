@@ -92,6 +92,19 @@ const ManageCourses = () => {
       console.error("Error uploading file:", error);
     }
   };
+  const handleDownloadSampleCSV = () => {
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      ["course_code,course_title,dept_name,sem,syllabus_year,credits"].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "sample_courses.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
+
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: ".csv",
@@ -195,6 +208,9 @@ const ManageCourses = () => {
             </Typography>
           </Paper>
           {file && <Typography>Selected File: {file.name}</Typography>}
+          <Button onClick={handleDownloadSampleCSV} color="info" variant="text">
+            Download Sample CSV
+          </Button>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleUploadDialogClose}>Cancel</Button>

@@ -136,7 +136,7 @@ const EditProgramme = ({ open, onClose, programmeId, refreshProgrammes }) => {
 
           <TextField
             fullWidth
-            label="Number of Positions"
+            label="Number of PO's"
             name="no_of_pos"
             type="number"
             value={formData.no_of_pos}
