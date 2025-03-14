@@ -98,6 +98,19 @@ const ManageFaculties = () => {
     }
   };
 
+  const handleDownloadSampleCSV = () => {
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      ["name,dept_name,email,mob"].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "sample_faculties.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
+
   const { getRootProps, getInputProps } = useDropzone({
     accept: ".csv",
     onDrop: (acceptedFiles) => {
@@ -196,6 +209,9 @@ const ManageFaculties = () => {
             </Typography>
           </Paper>
           {file && <Typography>Selected File: {file.name}</Typography>}
+          <Button onClick={handleDownloadSampleCSV} color="info" variant="text">
+            Download Sample CSV
+          </Button>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleUploadDialogClose}>Cancel</Button>
