@@ -71,6 +71,21 @@ const ExactLayout = () => {
     setAnchorEl(null);
   };
 
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === "access_token" || event.key === "role") {
+        // Logout when token or role changes
+        window.location.reload()
+      }
+    };
+  
+    window.addEventListener("storage", handleStorageChange);
+  
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [navigate]);
+  
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
