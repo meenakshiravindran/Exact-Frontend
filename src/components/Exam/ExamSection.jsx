@@ -204,14 +204,35 @@ const ExamSectionPage = () => {
         })),
       };
 
+      console.log("Sending preview data:", previewData); // Debug log
+
       const response = await axios.post(
         "http://localhost:8000/exam-preview/",
-        previewData
+        previewData,
+        {
+          responseType: "blob",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
-      setPreviewData(response.data.image);
-      setIsPreviewOpen(true); // Open the drawer
+
+      // Convert blob to base64
+      const pdfBlob = await response.data;
+      const pdfBase64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Data = reader.result.split(",")[1]; // Get only the base64 data
+          resolve(base64Data);
+        };
+        reader.readAsDataURL(pdfBlob);
+      });
+
+      setPreviewData(pdfBase64);
+      setIsPreviewOpen(true);
     } catch (error) {
       console.error("Error generating preview:", error);
+      setError(error.message || "Failed to generate exam preview.");
     }
   };
 
@@ -350,8 +371,8 @@ const ExamSectionPage = () => {
             open={isPreviewOpen}
             onClose={() => setIsPreviewOpen(false)}
           >
-            <Box sx={{ width: "50vw", padding: "20px" }}>
-              {previewData && <ExamPreview previewData={previewData} />}
+            <Box sx={{ width: "40vw", padding: "20px" }}>
+              {previewData && <ExamPreview previewData={previewData} examDetails={examDetails}/>}
             </Box>
           </Drawer>
 
