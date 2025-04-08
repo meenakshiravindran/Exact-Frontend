@@ -9,12 +9,17 @@ import {
   CircularProgress,
   Alert,
   Paper,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { CloudUpload, SmartToy } from "@mui/icons-material";
 
 const PDFQuestionGenerator = () => {
   const [file, setFile] = useState(null);
-  const [marks, setMarks] = useState(5);
+  // const [marks, setMarks] = useState(5);
+  const [questionType, setQuestionType] = useState("short answer");
   const [noOfQuestions, setNoOfQuestions] = useState(5);
   const [questions, setQuestions] = useState([]);
   const [error, setError] = useState("");
@@ -23,10 +28,6 @@ const PDFQuestionGenerator = () => {
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
     setError("");
-  };
-
-  const handleMarksChange = (event) => {
-    setMarks(event.target.value);
   };
 
   const handleNoOfQuestionsChange = (event) => {
@@ -41,7 +42,7 @@ const PDFQuestionGenerator = () => {
 
     const formData = new FormData();
     formData.append("pdf", file);
-    formData.append("marks", marks);
+    formData.append("question_type", questionType);
     formData.append("no_of_questions", noOfQuestions);
 
     setLoading(true);
@@ -102,15 +103,19 @@ const PDFQuestionGenerator = () => {
         </label>
         {file && <Typography variant="body1">Selected: {file.name}</Typography>}
 
-        <TextField
-          fullWidth
-          type="number"
-          label="Marks per Question"
-          variant="outlined"
-          value={marks}
-          onChange={handleMarksChange}
-          sx={{ marginTop: 2 }}
-        />
+        <FormControl fullWidth sx={{ marginTop: 2  , textAlign: "left"}}>
+          <InputLabel id="question-type-label">Question Type</InputLabel>
+          <Select
+            labelId="question-type-label"
+            value={questionType}
+            label="Question Type"
+            onChange={(e) => setQuestionType(e.target.value)}
+          >
+            <MenuItem value="one-word">One-word</MenuItem>
+            <MenuItem value="short answer">Short Answer</MenuItem>
+            <MenuItem value="essay">Essay</MenuItem>
+          </Select>
+        </FormControl>
 
         <TextField
           fullWidth
